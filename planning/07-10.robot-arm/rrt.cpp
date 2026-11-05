@@ -53,7 +53,6 @@ RRT::~RRT() {
 }
 
 std::vector<double*> RRT::query(double *startCfg, double *goalCfg) {
-    RTRBENCH_LOOP("RRT sampling and path loops");
     auto generateRandomRatio = []() {
         return static_cast<double>(rand()) / RAND_MAX;
     };
@@ -97,22 +96,25 @@ std::vector<double*> RRT::query(double *startCfg, double *goalCfg) {
             return r;
         };
 
-        for (int i = 0; i < this->ppIters; i++) {
-            int pLength = static_cast<int>(path.size());
-            if (pLength < 4) break;
+        {
+            RTRBENCH_LOOP("Path-shortcut anchor trials");
+            for (int i = 0; i < this->ppIters; i++) {
+                int pLength = static_cast<int>(path.size());
+                if (pLength < 4) break;
 
-            int anchorA = generateRandomInteger(0, pLength - 3);
-            int anchorB = generateRandomInteger(anchorA + 1, pLength - 2);
-            assert((anchorA >= 0) && (anchorA < anchorB) && \
-                    (anchorB < pLength-1));
+                int anchorA = generateRandomInteger(0, pLength - 3);
+                int anchorB = generateRandomInteger(anchorA + 1, pLength - 2);
+                assert((anchorA >= 0) && (anchorA < anchorB) && \
+                        (anchorB < pLength-1));
 
-            double *candidateA = path[anchorA];
-            double *candidateB = path[anchorB];
+                double *candidateA = path[anchorA];
+                double *candidateB = path[anchorB];
 
-            if (canConnect(candidateA, candidateB)) {
-                while (anchorB > anchorA) {
-                    path.erase(path.begin() + anchorB);
-                    anchorB--;
+                if (canConnect(candidateA, candidateB)) {
+                    while (anchorB > anchorA) {
+                        path.erase(path.begin() + anchorB);
+                        anchorB--;
+                    }
                 }
             }
         }
@@ -174,11 +176,14 @@ int RRT::findNearestNeighbour(double *cfg) const {
     int bestIndex = -1;
 
     double dist;
-    for (int i = 0; i < static_cast<int>(tree.size()); i++) {
-        dist = getNorm(tree[i].first, cfg);
-        if (dist < minDistance) {
-            minDistance = dist;
-            bestIndex = i;
+    {
+        RTRBENCH_LOOP("RRT nearest neighbor");
+        for (int i = 0; i < static_cast<int>(tree.size()); i++) {
+            dist = getNorm(tree[i].first, cfg);
+            if (dist < minDistance) {
+                minDistance = dist;
+                bestIndex = i;
+            }
         }
     }
 

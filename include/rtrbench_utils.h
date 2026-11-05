@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "zsim_hooks.h"
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -355,8 +356,11 @@ void matrixMultiplication(T **A, T **B, T **res, \
     for (int i = 0; i < rowA; i++) {
         for (int j = 0; j < colB; j++) {
             res[i][j] = 0;
-            for (int k = 0; k < rowB; k++) {
-                res[i][j] += A[i][k] * B[k][j];
+            {
+                RTRBENCH_LOOP("Matrix multiplication MAC");
+                for (int k = 0; k < rowB; k++) {
+                    res[i][j] += A[i][k] * B[k][j];
+                }
             }
         }
     }

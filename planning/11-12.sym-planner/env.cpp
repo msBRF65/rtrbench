@@ -280,7 +280,6 @@ Action Environment::getAction(string name) const {
 }
 
 Actions Environment::getAllGroundedActs() const {
-    RTRBENCH_LOOP("Action grounding loops");
     Actions allGroundedActs;
 
     for (Action act : this->actions) {

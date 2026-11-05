@@ -29,6 +29,7 @@
  * SOFTWARE.
 */
 
+#include "zsim_hooks.h"
 #include "sdcar.h"
 #include <algorithm>
 #include <fstream>
@@ -93,8 +94,11 @@ SelfDrivingCar::~SelfDrivingCar() {
 
 std::vector<STATE> SelfDrivingCar::getNeighbors(const STATE &s) const {
     std::vector<STATE> neighbors;
-    for (int i = 0; i < this->numNeighbors; i++) {
-        neighbors.push_back({s[0] + this->dX[i], s[1] + this->dY[i]});
+    {
+        RTRBENCH_LOOP("2D neighbor coordinates");
+        for (int i = 0; i < this->numNeighbors; i++) {
+            neighbors.push_back({s[0] + this->dX[i], s[1] + this->dY[i]});
+        }
     }
 
     return neighbors;
@@ -116,12 +120,15 @@ double SelfDrivingCar::getH(const STATE &s) const {
 
 bool SelfDrivingCar::isObstacle(const STATE &s) const {
     for (int i = 0; i <= this->robotWidth; i++) {
-        for (int j = 0; j <= this->robotLength; j++) {
-            int x = s[0] + j;
-            int y = s[1] + i;
+        {
+            RTRBENCH_LOOP("2D footprint collision");
+            for (int j = 0; j <= this->robotLength; j++) {
+                int x = s[0] + j;
+                int y = s[1] + i;
 
-            if (this->env[y][x]) {
-                return true;
+                if (this->env[y][x]) {
+                    return true;
+                }
             }
         }
     }

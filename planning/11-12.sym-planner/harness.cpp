@@ -40,7 +40,6 @@
 #include "zsim_hooks.h"
 
 list<GroundedAction> plan(Environment* env, int aStarWeight) {
-    RTRBENCH_LOOP("Symbolic A-star action loop");
     State startState = env->getStartConds();
     State goalState = env->getGoalConds();
     int maxAddedLiterals = env->getMaxAddedLiterals();
@@ -48,8 +47,11 @@ list<GroundedAction> plan(Environment* env, int aStarWeight) {
     auto getHeuristic = [maxAddedLiterals, goalState, aStarWeight]\
                         (State const &s) {
         int diff = 0;
-        for (GroundedCondition gCond : goalState) {
-            if (s.find(gCond) == s.end()) diff++;
+        {
+            RTRBENCH_LOOP("Goal-condition heuristic");
+            for (GroundedCondition gCond : goalState) {
+                if (s.find(gCond) == s.end()) diff++;
+            }
         }
         return static_cast<double>(diff) / maxAddedLiterals * aStarWeight;
     };
@@ -103,9 +105,12 @@ list<GroundedAction> plan(Environment* env, int aStarWeight) {
     };
 
     auto canApplyAction = [](State const &s, GroundedAction const &ga) {
-        for (GroundedCondition precond : ga.getPreconditions()) {
-            if (s.find(precond) == s.end()) {
-                return false;
+        {
+            RTRBENCH_LOOP("Action precondition matching");
+            for (GroundedCondition precond : ga.getPreconditions()) {
+                if (s.find(precond) == s.end()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -114,13 +119,16 @@ list<GroundedAction> plan(Environment* env, int aStarWeight) {
     auto applyAction = [](State const &s, GroundedAction const &ga) {
         State newState = State(s);
 
-        for (GroundedCondition effect : ga.getEffects()) {
-            if (effect.getTruth()) {
-                newState.insert(effect);
-            } else {
-                GroundedCondition negatedEffect = effect.getNegated();
-                assert((newState.find(negatedEffect) != newState.end()));
-                newState.erase(negatedEffect);
+        {
+            RTRBENCH_LOOP("Action effects");
+            for (GroundedCondition effect : ga.getEffects()) {
+                if (effect.getTruth()) {
+                    newState.insert(effect);
+                } else {
+                    GroundedCondition negatedEffect = effect.getNegated();
+                    assert((newState.find(negatedEffect) != newState.end()));
+                    newState.erase(negatedEffect);
+                }
             }
         }
 

@@ -61,7 +61,6 @@ void outputPath(std::string fileName) {
 }
 
 void backwardDijkstra2D(Environment *env) {
-    RTRBENCH_LOOP("Backward Dijkstra loop");
     // Run Dijkstra to get the G values of nodes in 2D. At the beginning, put
     // ALL points of target's trajectory into the OPEN list.
 
@@ -114,18 +113,21 @@ void backwardDijkstra2D(Environment *env) {
 
         closedList[expNode->x][expNode->y] = true;
 
-        for (int i = 0; i < NUM_2D_DIRS; i++) {
-            int newX = expNode->x + dX[i];
-            int newY = expNode->y + dY[i];
+        {
+            RTRBENCH_LOOP("Dijkstra neighbor relaxation");
+            for (int i = 0; i < NUM_2D_DIRS; i++) {
+                int newX = expNode->x + dX[i];
+                int newY = expNode->y + dY[i];
 
-            if (closedList[newX][newY]) continue;
-            if (!env->isValid(newX, newY)) continue;
-            if (!env->isFree(newX, newY)) continue;
+                if (closedList[newX][newY]) continue;
+                if (!env->isValid(newX, newY)) continue;
+                if (!env->isFree(newX, newY)) continue;
 
-            int newCost = gVals2D[expNode->x][expNode->y] + 1;
-            if (newCost < gVals2D[newX][newY]) {
-                gVals2D[newX][newY] = newCost;
-                heap.push(new Node(newX, newY, newCost));
+                int newCost = gVals2D[expNode->x][expNode->y] + 1;
+                if (newCost < gVals2D[newX][newY]) {
+                    gVals2D[newX][newY] = newCost;
+                    heap.push(new Node(newX, newY, newCost));
+                }
             }
         }
     }
@@ -167,7 +169,6 @@ inline double getMin2DDist(int x1, int y1, int x2, int y2) {
 }
 
 void aStar3D(Environment *env) {
-    RTRBENCH_LOOP("Time-space A-star loop");
     const int NUM_3D_DIRS = 9;
     // In 3D with time as the third dimension, there's one more action: in the
     // next step (dt=1), stay in the same place (dx=dy=0)
@@ -224,29 +225,32 @@ void aStar3D(Environment *env) {
             break;
         }
 
-        for (int i = 0; i < NUM_3D_DIRS; i++) {
-            int newX = expNode->x + dX[i];
-            int newY = expNode->y + dY[i];
-            int newT = expNode->t + 1;
+        {
+            RTRBENCH_LOOP("Time-space neighbor relaxation");
+            for (int i = 0; i < NUM_3D_DIRS; i++) {
+                int newX = expNode->x + dX[i];
+                int newY = expNode->y + dY[i];
+                int newT = expNode->t + 1;
 
-            if (!env->isValid(newX, newY) || newT >= env->getTargetSteps()) {
-                continue;
-            }
-            if (!env->isFree(newX, newY)) continue;
-            if (isVisited(newX, newY, newT)) continue;
+                if (!env->isValid(newX, newY) || newT >= env->getTargetSteps()) {
+                    continue;
+                }
+                if (!env->isFree(newX, newY)) continue;
+                if (isVisited(newX, newY, newT)) continue;
 
-            int objX = env->getTargetX(newT), objY = env->getTargetY(newT);
-            if (getMin2DDist(newX, newY, objX, objY) > \
-                    env->getTargetSteps() - newT) {
-                continue;
-            }
+                int objX = env->getTargetX(newT), objY = env->getTargetY(newT);
+                if (getMin2DDist(newX, newY, objX, objY) > \
+                        env->getTargetSteps() - newT) {
+                    continue;
+                }
 
-            int newCost = getGVal(expNode->x, expNode->y, expNode->t) + \
-                          env->getCellCost(newX, newY);
-            if (newCost < getGVal(newX, newY, newT)) {
-                updateGVal(newX, newY, newT, newCost);
-                heap.push(new Node(newX, newY, newT, newCost, \
-                            gVals2D[newX][newY], expNode));
+                int newCost = getGVal(expNode->x, expNode->y, expNode->t) + \
+                              env->getCellCost(newX, newY);
+                if (newCost < getGVal(newX, newY, newT)) {
+                    updateGVal(newX, newY, newT, newCost);
+                    heap.push(new Node(newX, newY, newT, newCost, \
+                                gVals2D[newX][newY], expNode));
+                }
             }
         }
     }

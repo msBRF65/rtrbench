@@ -6,6 +6,7 @@
 
 /* Filename: solver.c. */
 /* Description: Main solver file. */
+#include "zsim_hooks.h"
 #include "solver.h"
 double eval_gap(void) {
   int i;
@@ -401,8 +402,11 @@ long solve(void) {
     else
       alpha = -0.99/minval;
     /* Update the primal and dual variables. */
-    for (i = 0; i < 56; i++)
-      work.x[i] += alpha*dx[i];
+    {
+        RTRBENCH_LOOP("QP primal update");
+        for (i = 0; i < 56; i++)
+          work.x[i] += alpha*dx[i];
+    }
     for (i = 0; i < 54; i++)
       work.s[i] += alpha*ds[i];
     for (i = 0; i < 54; i++)

@@ -95,7 +95,6 @@ void ParticleFilter::initializeMotionModel() {
 
 void ParticleFilter::updateMotion(READING *prevOdometry, \
         READING *currOdometry) {
-    RTRBENCH_LOOP("Motion particle loop");
     double xDiff = currOdometry->at(0) - prevOdometry->at(0);
     double yDiff = currOdometry->at(1) - prevOdometry->at(1);
     double thetaDiff = currOdometry->at(2) - prevOdometry->at(2);
@@ -128,13 +127,16 @@ void ParticleFilter::updateMotion(READING *prevOdometry, \
     double dTh = dTrans - thDist(generator);
     double dRh2 = dRot2 - h2Dist(generator);
 
-    for (int i = 0; i < this->numParticles; i++) {
-        double thetaPrime = this->particles[i].theta + dRh1;
+    {
+        RTRBENCH_LOOP("Particle motion");
+        for (int i = 0; i < this->numParticles; i++) {
+            double thetaPrime = this->particles[i].theta + dRh1;
 
-        this->particles[i].x += dTh * cos(thetaPrime);
-        this->particles[i].y += dTh * sin(thetaPrime);
-        this->particles[i].theta = wrapToPi(this->particles[i].theta\
-                + dRh1 + dRh2);
+            this->particles[i].x += dTh * cos(thetaPrime);
+            this->particles[i].y += dTh * sin(thetaPrime);
+            this->particles[i].theta = wrapToPi(this->particles[i].theta\
+                    + dRh1 + dRh2);
+        }
     }
 }
 
@@ -155,7 +157,6 @@ void ParticleFilter::initializeSensorModel() {
 }
 
 void ParticleFilter::updateSensor(READING *laserReading) {
-    RTRBENCH_LOOP("Sensor particle and ray loops");
     for (int i = 0; i < this->numParticles; i++) {
         double x = this->particles[i].x;
         double y = this->particles[i].y;
@@ -169,12 +170,15 @@ void ParticleFilter::updateSensor(READING *laserReading) {
                 == static_cast<int>(laserReading->size()));
 
         double probability = 1.0;
-        for (int eIdx = 0; eIdx < static_cast<int>(zStar.size()); eIdx++) {
-            int rIdx = eIdx * this->subsample;
+        {
+            RTRBENCH_LOOP("Ray likelihood product");
+            for (int eIdx = 0; eIdx < static_cast<int>(zStar.size()); eIdx++) {
+                int rIdx = eIdx * this->subsample;
 
-            double expDist = zStar[eIdx];
-            double readDist = laserReading->at(rIdx);
-            probability *= this->calcProbability(readDist, expDist);
+                double expDist = zStar[eIdx];
+                double readDist = laserReading->at(rIdx);
+                probability *= this->calcProbability(readDist, expDist);
+            }
         }
 
         this->particles[i].w = probability;
@@ -219,22 +223,25 @@ double ParticleFilter::rayCast(double x, double y, double theta, \
     double yStep = step * sin(PI/2 + theta - degToRad(degree));
 
     double dist = 0;
-    while (true) {
-        dist += step;
-        xRay += xStep;
-        yRay += yStep;
+    {
+        RTRBENCH_LOOP("Ray marching");
+        while (true) {
+            dist += step;
+            xRay += xStep;
+            yRay += yStep;
 
-        int xIdx = static_cast<int>(xRay / this->resolution);
-        int yIdx = static_cast<int>(yRay / this->resolution);
+            int xIdx = static_cast<int>(xRay / this->resolution);
+            int yIdx = static_cast<int>(yRay / this->resolution);
 
-        if (dist >= this->maxRange || xIdx >= this->occGrid->getX()\
-                || yIdx >= this->occGrid->getY() || xIdx < 0 || yIdx < 0) {
-            break;
-        }
+            if (dist >= this->maxRange || xIdx >= this->occGrid->getX()\
+                    || yIdx >= this->occGrid->getY() || xIdx < 0 || yIdx < 0) {
+                break;
+            }
 
-        double occ = this->occGrid->getProb(xIdx, yIdx);
-        if (occ == -1 || occ >= this->minProbability) {
-            break;
+            double occ = this->occGrid->getProb(xIdx, yIdx);
+            if (occ == -1 || occ >= this->minProbability) {
+                break;
+            }
         }
     }
     return dist;
@@ -247,7 +254,6 @@ void ParticleFilter::initializeResampler() {
 }
 
 void ParticleFilter::resample() {
-    RTRBENCH_LOOP("Particle resampling loops");
     // Low-variance sampling
 
     double wSum = 0;
@@ -267,9 +273,12 @@ void ParticleFilter::resample() {
 
     for (int m = 0; m < this->numParticles; m++) {
         double u = r + m*M1;
-        while (u > c) {
-            i++;
-            c += this->particles[i].w;
+        {
+            RTRBENCH_LOOP("Cumulative resampling search");
+            while (u > c) {
+                i++;
+                c += this->particles[i].w;
+            }
         }
         newParticles.push_back(this->particles[i]);
     }

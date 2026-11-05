@@ -125,28 +125,37 @@ int main(int argc, const char **argv) {
     zsim_roi_begin();
 
     {
-        RTRBENCH_LOOP("DMP integration and basis loops");
+        RTRBENCH_LOOP("DMP time integration");
         while (t <= T) {
             t += dt;
 
             // Compute the basis function values and force term
             double sum = 0;
             std::vector<double> Phi;
-            for (auto c : C) {
-                double p = exp(-0.5 * ((t/T-c)*(t/T-c) / H));
-                Phi.push_back(p);
+            {
+                RTRBENCH_LOOP("Gaussian basis values");
+                for (auto c : C) {
+                    double p = exp(-0.5 * ((t/T-c)*(t/T-c) / H));
+                    Phi.push_back(p);
 
-                sum += p;
+                    sum += p;
+                }
             }
 
-            for (int i = 0; i < static_cast<int>(Phi.size()); i++) {
-                Phi[i] /= sum;
+            {
+                RTRBENCH_LOOP("Basis normalization");
+                for (int i = 0; i < static_cast<int>(Phi.size()); i++) {
+                    Phi[i] /= sum;
+                }
             }
 
             double f = 0;
             assert(Phi.size() == weights.size());
-            for (int i = 0; i < static_cast<int>(weights.size()); i++) {
-                f += Phi[i] * weights[i];
+            {
+                RTRBENCH_LOOP("Force inner product");
+                for (int i = 0; i < static_cast<int>(weights.size()); i++) {
+                    f += Phi[i] * weights[i];
+                }
             }
 
             qdd = K*(g-q)/(T*T) - B*qd/T + (g-q0)*f/(T*T);

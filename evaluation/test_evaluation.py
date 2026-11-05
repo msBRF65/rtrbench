@@ -37,6 +37,42 @@ class EvaluationChecks(unittest.TestCase):
         self.assertEqual(roi[0]['instrumented_population_std_ms'], 1)
         self.assertEqual(roi[0]['observed_change_percent'], 0)
 
+    def test_three_trial_inclusive_elapsed_is_not_a_partition(self):
+        rows = []
+        for trial in range(3):
+            parent = dict(sample(trial=trial, elapsed=40000000), region='Parent',
+                          inclusive_ns=120000000, total_roi_ns=121000000)
+            child = dict(sample(trial=trial, elapsed=80000000), region='Child',
+                         inclusive_ns=80000000, total_roi_ns=121000000)
+            other = dict(sample(trial=trial, elapsed=1000000), inclusive_ns='', total_roi_ns=121000000)
+            rows.extend((parent, child, other))
+        summary, roi = aggregate(rows)
+        parts = {row['region']: row for row in summary}
+        self.assertEqual(parts['Parent']['inclusive_n'], 3)
+        self.assertEqual(parts['Parent']['inclusive_mean_ms'], 120)
+        self.assertEqual(parts['Parent']['mean_ms'], 40)
+        self.assertEqual(parts['Parent']['inclusive_population_std_ms'], 0)
+        self.assertGreater(sum(row['inclusive_mean_ms'] or 0 for row in summary),
+                           roi[0]['instrumented_mean_ms'])
+        self.assertIsNone(parts['Unattributed ROI']['inclusive_mean_ms'])
+
+    def test_missing_inclusive_and_unobserved_trials_are_not_inferred(self):
+        rows = [dict(sample(trial=0, elapsed=1000000), region='Loop', inclusive_ns=1000000),
+                sample(trial=1, elapsed=1000000), sample(trial=2, elapsed=1000000)]
+        summary, roi = aggregate(rows)
+        loop = next(row for row in summary if row['region'] == 'Loop')
+        self.assertEqual(roi[0]['n'], 3)
+        self.assertEqual(loop['n'], 1)
+        self.assertEqual(loop['inclusive_n'], 1)
+        legacy, _ = aggregate([sample()])
+        self.assertIsNone(legacy[0]['inclusive_mean_ms'])
+        evaluate(rows, self.root, tables_only=True)
+        self.assertIn('| 1/3 | 1 |', (self.root/'REPORT.md').read_text())
+
+    def test_inclusive_smaller_than_exclusive_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'Inclusive'):
+            aggregate([dict(sample(), region="Loop", inclusive_ns=1)])
+
     def test_invalid_accounting_rejected(self):
         for rows in ([sample(elapsed=-1)], [dict(sample(), total_roi_ns=3)], [sample(), sample()]):
             with self.subTest(rows=rows), self.assertRaises(ValueError):

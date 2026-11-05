@@ -52,7 +52,6 @@ RRTStar::~RRTStar() {
 }
 
 std::vector<double*> RRTStar::query(double *startCfg, double *goalCfg) {
-    RTRBENCH_LOOP("RRT-star sampling loop");
     auto generateRandomRatio = []() {
         return static_cast<double>(rand()) / RAND_MAX;
     };
@@ -136,21 +135,24 @@ RRTStar::EXT_STATUS RRTStar::extendRewireTree(double *randCfg, \
 
     tree.push_back(RRTStar_Vertice(newCfg, minIndex /*best parent*/, minCost));
 
-    for (auto const& xNear : neighbors) {
-        if (xNear.first == minIndex) continue;
+    {
+        RTRBENCH_LOOP("RRT-star rewiring");
+        for (auto const& xNear : neighbors) {
+            if (xNear.first == minIndex) continue;
 
-        if (!canConnect(newCfg, tree[xNear.first].cfg)) continue;
+            if (!canConnect(newCfg, tree[xNear.first].cfg)) continue;
 
-        double newCost = tree.back().cost + \
-                         getNorm(newCfg, tree[xNear.first].cfg);
-        assert(tree.back().cost > 0);
-        assert(getNorm(newCfg, tree[xNear.first].cfg) > 0);
-        assert(newCost > 0);
-        assert(newCost > minCost);
+            double newCost = tree.back().cost + \
+                             getNorm(newCfg, tree[xNear.first].cfg);
+            assert(tree.back().cost > 0);
+            assert(getNorm(newCfg, tree[xNear.first].cfg) > 0);
+            assert(newCost > 0);
+            assert(newCost > minCost);
 
-        if (newCost < tree[xNear.first].cost) {
-            tree[xNear.first].cost = newCost;
-            tree[xNear.first].parent = tree.size() - 1;     // newCfg
+            if (newCost < tree[xNear.first].cost) {
+                tree[xNear.first].cost = newCost;
+                tree[xNear.first].parent = tree.size() - 1;     // newCfg
+            }
         }
     }
 
@@ -166,11 +168,14 @@ int RRTStar::findNearestNeighbour(double *cfg) const {
     int bestIndex = -1;
 
     double dist;
-    for (int i = 0; i < static_cast<int>(tree.size()); i++) {
-        dist = getNorm(tree[i].cfg, cfg);
-        if (dist < minDistance) {
-            minDistance = dist;
-            bestIndex = i;
+    {
+        RTRBENCH_LOOP("RRT-star nearest neighbor");
+        for (int i = 0; i < static_cast<int>(tree.size()); i++) {
+            dist = getNorm(tree[i].cfg, cfg);
+            if (dist < minDistance) {
+                minDistance = dist;
+                bestIndex = i;
+            }
         }
     }
 

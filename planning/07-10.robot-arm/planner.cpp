@@ -221,25 +221,28 @@ double *Planner::getMiddleCfg(double *cfg1, double *cfg2, int sampleNumber,
         int totalSamples, bool *bitmap) const {
     double *midCfg = new double[this->dof];
 
-    for (int j = 0; j < this->dof; j++) {
-        if (bitmap[j]) {
-            // The back path is better -> The interpolation should be on
-            // the reverse direction
-            if (cfg1[j] < cfg2[j]) {
-                midCfg[j] = cfg1[j] + MAX_ANGLE + \
-                            static_cast<double>(sampleNumber) / totalSamples * \
-                            (cfg2[j] - cfg1[j] - MAX_ANGLE);
+    {
+        RTRBENCH_LOOP("Joint interpolation");
+        for (int j = 0; j < this->dof; j++) {
+            if (bitmap[j]) {
+                // The back path is better -> The interpolation should be on
+                // the reverse direction
+                if (cfg1[j] < cfg2[j]) {
+                    midCfg[j] = cfg1[j] + MAX_ANGLE + \
+                                static_cast<double>(sampleNumber) / totalSamples * \
+                                (cfg2[j] - cfg1[j] - MAX_ANGLE);
+                } else {
+                    midCfg[j] = cfg1[j] + MAX_ANGLE + \
+                                static_cast<double>(sampleNumber) / totalSamples * \
+                                (cfg2[j] - cfg1[j] + MAX_ANGLE);
+                }
+                midCfg[j] = fmod(midCfg[j], MAX_ANGLE);
             } else {
-                midCfg[j] = cfg1[j] + MAX_ANGLE + \
-                            static_cast<double>(sampleNumber) / totalSamples * \
-                            (cfg2[j] - cfg1[j] + MAX_ANGLE);
+                // The front path is better: A simple interpolation
+                // between two angles
+                midCfg[j] = cfg1[j] + static_cast<double>(sampleNumber) / \
+                            totalSamples * (cfg2[j] - cfg1[j]);
             }
-            midCfg[j] = fmod(midCfg[j], MAX_ANGLE);
-        } else {
-            // The front path is better: A simple interpolation
-            // between two angles
-            midCfg[j] = cfg1[j] + static_cast<double>(sampleNumber) / \
-                        totalSamples * (cfg2[j] - cfg1[j]);
         }
     }
 
@@ -247,7 +250,6 @@ double *Planner::getMiddleCfg(double *cfg1, double *cfg2, int sampleNumber,
 }
 
 bool Planner::canConnect(double *cfg1, double *cfg2) const {
-    RTRBENCH_LOOP("Configuration interpolation loop");
     assert(isValidArmConfiguration(cfg1));
     assert(isValidArmConfiguration(cfg2));
 

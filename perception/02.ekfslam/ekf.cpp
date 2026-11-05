@@ -199,7 +199,6 @@ ExtKalmanFillter::~ExtKalmanFillter() {
 }
 
 void ExtKalmanFillter::predict(double d, double alpha) {
-    RTRBENCH_LOOP("State prediction matrix loops");
     double xT = this->X[0], yT = this->X[1], thetaT = this->X[2];
     this->X[0] = xT + d*cos(thetaT);
     this->X[1] = yT + d*sin(thetaT);
@@ -284,7 +283,6 @@ void ExtKalmanFillter::predict(double d, double alpha) {
 }
 
 void ExtKalmanFillter::update(const std::vector<double> &measure) {
-    RTRBENCH_LOOP("Landmark update matrix loops");
     assert(this->numLandmarks * 2 == static_cast<int>(measure.size()));
 
     for (int l = 0; l < this->numLandmarks; l++) {
@@ -363,8 +361,11 @@ void ExtKalmanFillter::update(const std::vector<double> &measure) {
         }
         matrixMultiplication(kalmanGain, diff, stateUpdate, this->numEntries, \
                 this->NUM_MEAS_TYPE, 1);
-        for (int i = 0; i < this->numEntries; i++) {
-            this->X[i] += stateUpdate[i][0];
+        {
+            RTRBENCH_LOOP("EKF state update");
+            for (int i = 0; i < this->numEntries; i++) {
+                this->X[i] += stateUpdate[i][0];
+            }
         }
 
         double **covUpdate = new double*[this->numEntries];
@@ -386,8 +387,11 @@ void ExtKalmanFillter::update(const std::vector<double> &measure) {
                 this->numEntries, this->numEntries);
 
         for (int i = 0; i < this->numEntries; i++) {
-            for (int j = 0; j < this->numEntries; j++) {
-                this->P[i][j] = temp7[i][j];
+            {
+                RTRBENCH_LOOP("EKF covariance copy");
+                for (int j = 0; j < this->numEntries; j++) {
+                    this->P[i][j] = temp7[i][j];
+                }
             }
         }
 

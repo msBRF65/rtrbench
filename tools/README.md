@@ -33,40 +33,56 @@ loading and are provenance only, never the compute bars.
 
 ## What is measured
 
-`regions.json` maps each curated loop-containing function or loop region to a
-file, symbol, callsite line and processing label. The regions were selected by
-reading the compute code (particle/ray loops, matrix updates, graph searches,
-configuration interpolation, symbolic actions, basis integration, MPC refinements,
-policy samples/fits and Gaussian-process loops). Actual timings rank these regions;
-this does not claim exhaustive automatic identification of every C++ loop.
+`regions.json` maps 44 actual `for`/`while` sites to source headers and end lines.
+Each timing scope starts immediately before the complete loop and closes immediately
+after it, including its loop control and calls. Function setup, enclosing decisions,
+allocation outside the loop and post-loop cleanup are excluded from that loop's
+interval. They remain in Other unless another selected loop covers them. A
+straight-line weighted-fusion expression is not a loop and has no invented timer.
+`check_loop_boundaries.py` verifies the declared scope/header/end alignment.
 
-The C++17 `steady_clock` ledger measures **main-thread wall time inside the existing
-zsim ROI**, including scheduling delays. It is not CPU time or hardware-counter
-sampling. Entering a nested region charges prior time to its parent; subsequent
-time belongs only to the child. Every nanosecond is charged once, to the innermost
-region or `Unattributed ROI`. The exported sum must equal the ROI total exactly.
-This partitions wall time, not a chronological trace of phases.
+The clocks measure main-thread `steady_clock` wall time inside the **existing zsim
+ROIs**, including scheduling delays. They are not CPU cycles or instruction counts.
+Two distinct values are retained:
 
-Existing ROI pauses in CEM/BO exclude their fake physical rollouts, including when
-a loop scope spans a pause. Input parsing, output serialization, PRM's existing
-pre-ROI graph initialization, and builds remain outside compute ROI. Thus PRM's
-bars describe its query, not all offline roadmap preparation. The region call
-count includes entries outside the ROI; it is not a timed iteration count.
+- `inclusive_ns`: the complete target-loop interval, including nested selected
+  loops and called functions. It is summed over that loop's invocations in the
+  process. Nested inclusive intervals overlap and **must not be summed as an ROI
+  partition**. This is not a per-iteration average.
+- `exclusive_ns`: only intervals where this target is the innermost active selected
+  scope. Exclusive values plus `Unattributed ROI` exactly partition each ROI trial.
+  Other has no inclusive-loop value; its inclusive field is blank.
 
-The default build has all instrumentation compiled out. Optional parallel/OpenMP
-modes are not supported by this main-thread ledger; foreign-thread timing use
-aborts rather than silently double-counting. Invalid ROI boundaries, unbalanced
-scopes, accounting errors and timing-file write failures also fail the run.
+A logical clock advances only during active ROI segments, so CEM/BO fake physical
+rollout pauses remain excluded even when a loop spans a pause. Input loading,
+output serialization, PRM offline graph construction and initial pre-ROI GP training
+remain outside the existing compute contract. Helpers such as depth unprojection
+can therefore be reached only outside ROI: they are **not measured**, not timed zero.
 
-`run.sh` supports `RTRBENCH_BINARY_ROOT=/absolute/mirrored/binary/tree` for the
-isolated builds; do not combine that setting with `--build`. Each launched kernel
-receives `RTRBENCH_TIMING_FILE=<its-result-directory>/loops.csv`. Ordinary binaries
-ignore it. No shell-global timing file is shared between kernels.
+Numeric loop CSV rows contain only ROI-overlap invocations. `calls` counts those
+invocations, not loop iterations. The companion `loops.csv.coverage.csv` records
+all reached scope `entries`, `roi_calls`, and `measured`/`outside_roi` status. A scope
+never reached has no registration metadata; the static manifest still lists it.
+Missing observations must not be filled with fabricated zero durations. Templates
+sharing one source callsite are registered once. A loop with zero body iterations
+can still have measured initialization/condition-check time.
+
+Default builds compile clocks out. Optional parallel/OpenMP modes remain unsupported
+by this main-thread ledger; foreign-thread use aborts rather than double-counts.
+Invalid boundaries, unbalanced scopes, accounting errors and file write failures
+fail the process.
+
+`run.sh` supports `RTRBENCH_BINARY_ROOT=/absolute/mirrored/binary/tree` for isolated
+builds; do not combine it with `--build`. Each kernel receives its own
+`RTRBENCH_TIMING_FILE`. Older CSVs without `inclusive_ns` can still be read, but the
+missing elapsed metric is explicitly unavailable and is never inferred from exclusive
+time. A mixed legacy/new plot labels legacy bars as exclusive-only.
 
 ## Precision and overhead
 
-`check_timer.py` checks nested exclusive scopes, exclusion of a deliberately
-paused interval, and failure on a mispaired boundary. Seven empty-scope trials
+`check_timer.py` checks nested inclusive/exclusive scopes, exclusion of a deliberately
+paused interval, function setup outside a loop, ROI-spanning scopes, template
+registration, outside-ROI metadata and failure on a mispaired boundary. Seven empty-scope trials
 estimate incremental timing cost relative to ROI-only binaries. This cost is
 machine/compiler dependent and should be rerun on a different environment.
 
@@ -76,7 +92,7 @@ cost, code-layout changes and run noise; it is not an overhead correction or a
 speedup result. Tiny kernels/parts may be dominated by instrumentation. A recorded
 zero is below clock resolution, not proof of no work. The overview uses one ordinary
 compute-ROI bar per benchmark. Each benchmark has one PNG with measured processing
-names on the x axis and exclusive time on the y axis, including an Other bar for
+names on the x axis and inclusive loop elapsed on the y axis, including an exclusive Other bar for
 ROI time outside named regions. Region bars share a time axis within each chart.
 
 ## Root runner integration

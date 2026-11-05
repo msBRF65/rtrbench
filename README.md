@@ -149,7 +149,7 @@ SOFTWARE.
 
 ## Compute-loop timing
 
-[tools/README.md](tools/README.md) describes opt-in, exclusive ROI loop measurement
+[tools/README.md](tools/README.md) describes opt-in inclusive loop elapsed and exclusive ROI accounting
 and paired baseline checks for the 15 bundled workloads other than scene
 reconstruction. [evaluation/README.md](evaluation/README.md) describes reproducible
 PNG timing bar charts, raw statistics, and overhead/precision limits. Normal builds
@@ -204,8 +204,8 @@ run's absolute `build/` path without `--build`; ordinary uninstrumented binaries
 will fail evaluation because their timing files are missing.
 
 Scene reconstruction still needs its prepared inputs; use `--skip 03.srec` when
-unavailable. With a real prepared scene and calibration, its existing ROI is
-measured as `Other` only: no named SREC loop regions are claimed. See
+unavailable. With real prepared inputs, selected SREC loops inside its existing ROI
+are measured; off-ROI helpers are listed as unmeasured in coverage metadata. See
 [evaluation/README.md](evaluation/README.md) for the generated figures and limits.
 
 To evaluate **all 16 together**, first prepare the two-frame scene with the
@@ -217,5 +217,20 @@ To evaluate **all 16 together**, first prepare the two-frame scene with the
 ```
 
 The same timestamped evaluation directory then contains the overview plus all 16
-benchmark PNGs. SREC contributes its measured compute ROI as `Other`, using the
-same real raw-derived inputs as its standalone workflow.
+benchmark PNGs. SREC uses the same real raw-derived inputs as its standalone workflow.
+Its in-ROI targets are timed; depth unprojection outside ROI is not plotted as zero.
+
+### Actual target-loop elapsed time
+
+Timing guards surround the actual `for`/`while` loops, excluding function setup
+and cleanup. The region CSV/report retains both inclusive loop elapsed (including
+nested loops/calls) and exclusive self time. Per-benchmark loop bars are inclusive
+and can overlap; they are not an additive partition. Other is exclusive ROI time
+outside every selected target. The overview remains the complete compute ROI.
+
+Off-ROI-only and unexecuted targets are not fabricated as zero-duration loops.
+Coverage files distinguish reached outside-ROI helpers; the source manifest lists
+all 44 sites. Repeated reports show each region's actual observed trial count;
+missing observations do not silently become zero samples. Short loops can be
+strongly affected by clock/bookkeeping overhead; baseline comparisons remain
+observations, not corrected speedup claims.

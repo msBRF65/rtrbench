@@ -29,6 +29,7 @@
  * SOFTWARE.
 */
 
+#include "zsim_hooks.h"
 #include "drone.h"
 #include <algorithm>
 #include <fstream>
@@ -95,9 +96,12 @@ std::vector<STATE> Drone::getNeighbors(const STATE &s) const {
             static_cast<int>(this->dZ.size()) == numNeighbors);
 
     std::vector<STATE> neighbors;
-    for (int i = 0; i < numNeighbors; i++) {
-        neighbors.push_back({ s[0] + this->dX[i], s[1] + this->dY[i], \
-                s[2] + this->dZ[i] });
+    {
+        RTRBENCH_LOOP("3D neighbor coordinates");
+        for (int i = 0; i < numNeighbors; i++) {
+            neighbors.push_back({ s[0] + this->dX[i], s[1] + this->dY[i], \
+                    s[2] + this->dZ[i] });
+        }
     }
 
     return neighbors;

@@ -69,7 +69,6 @@ ModelPredictiveControl::~ModelPredictiveControl() {
 
 TRAJ_VEC *ModelPredictiveControl::simulate(double maxTime, double goalDist, \
         double stopSpeed, double dl, int maxIters, int neighbors) {
-    RTRBENCH_LOOP("MPC simulation loop");
     int sCourseLength = static_cast<int>(this->splineCourse->size());
     std::pair<double, double> goal = {
         this->splineCourse->at(sCourseLength-1).at(0),   // X
@@ -292,7 +291,6 @@ void ModelPredictiveControl::predictMotion(double **xBar, State *state, \
 
 bool ModelPredictiveControl::linearMpcControl(double **xRef, double **xBar, \
         State *state, double *oA, double *oDelta) {
-    RTRBENCH_LOOP("QP assembly and solver loops");
     for (int i = 1; i <= this->T; i++) {
         for (int j = 0; j < this->NX; j++) {
             params.xRef[i][j] = xRef[j][i];
@@ -308,42 +306,45 @@ bool ModelPredictiveControl::linearMpcControl(double **xRef, double **xBar, \
         return row + col * this->NX;
     };
 
-    for (int t = 0; t < this->T; t++) {
-        double v = xBar[2][t];
-        double phi = xBar[3][t];
-        double sinPhi = sin(phi);
-        double cosPhi = cos(phi);
+    {
+        RTRBENCH_LOOP("QP horizon assembly");
+        for (int t = 0; t < this->T; t++) {
+            double v = xBar[2][t];
+            double phi = xBar[3][t];
+            double sinPhi = sin(phi);
+            double cosPhi = cos(phi);
 
-        params.A[t][getAIdx(0, 0)] = 1.0;
-        params.A[t][getAIdx(0, 1)] = 0.0;
-        params.A[t][getAIdx(0, 2)] = this->dt * cosPhi;
-        params.A[t][getAIdx(0, 3)] = -this->dt * v * sinPhi;
-        params.A[t][getAIdx(1, 0)] = 0.0;
-        params.A[t][getAIdx(1, 1)] = 1.0;
-        params.A[t][getAIdx(1, 2)] = this->dt * sinPhi;
-        params.A[t][getAIdx(1, 3)] = this->dt * v * cosPhi;
-        params.A[t][getAIdx(2, 0)] = 0.0;
-        params.A[t][getAIdx(2, 1)] = 0.0;
-        params.A[t][getAIdx(2, 2)] = 1.0;
-        params.A[t][getAIdx(2, 3)] = 0.0;
-        params.A[t][getAIdx(3, 0)] = 0.0;
-        params.A[t][getAIdx(3, 1)] = 0.0;
-        params.A[t][getAIdx(3, 2)] = 0.0;
-        params.A[t][getAIdx(3, 3)] = 1.0;
+            params.A[t][getAIdx(0, 0)] = 1.0;
+            params.A[t][getAIdx(0, 1)] = 0.0;
+            params.A[t][getAIdx(0, 2)] = this->dt * cosPhi;
+            params.A[t][getAIdx(0, 3)] = -this->dt * v * sinPhi;
+            params.A[t][getAIdx(1, 0)] = 0.0;
+            params.A[t][getAIdx(1, 1)] = 1.0;
+            params.A[t][getAIdx(1, 2)] = this->dt * sinPhi;
+            params.A[t][getAIdx(1, 3)] = this->dt * v * cosPhi;
+            params.A[t][getAIdx(2, 0)] = 0.0;
+            params.A[t][getAIdx(2, 1)] = 0.0;
+            params.A[t][getAIdx(2, 2)] = 1.0;
+            params.A[t][getAIdx(2, 3)] = 0.0;
+            params.A[t][getAIdx(3, 0)] = 0.0;
+            params.A[t][getAIdx(3, 1)] = 0.0;
+            params.A[t][getAIdx(3, 2)] = 0.0;
+            params.A[t][getAIdx(3, 3)] = 1.0;
 
-        params.B[t][getBIdx(0, 0)] = 0.0;
-        params.B[t][getBIdx(0, 1)] = 0.0;
-        params.B[t][getBIdx(1, 0)] = 0.0;
-        params.B[t][getBIdx(1, 1)] = 0.0;
-        params.B[t][getBIdx(2, 0)] = this->dt;
-        params.B[t][getBIdx(2, 1)] = 0.0;
-        params.B[t][getBIdx(3, 0)] = 0.0;
-        params.B[t][getBIdx(3, 1)] = this->dt * v / this->wheelBase;
+            params.B[t][getBIdx(0, 0)] = 0.0;
+            params.B[t][getBIdx(0, 1)] = 0.0;
+            params.B[t][getBIdx(1, 0)] = 0.0;
+            params.B[t][getBIdx(1, 1)] = 0.0;
+            params.B[t][getBIdx(2, 0)] = this->dt;
+            params.B[t][getBIdx(2, 1)] = 0.0;
+            params.B[t][getBIdx(3, 0)] = 0.0;
+            params.B[t][getBIdx(3, 1)] = this->dt * v / this->wheelBase;
 
-        params.C[t][0] = this->dt * v * sinPhi * phi;
-        params.C[t][1] = -this->dt * v * cosPhi * phi;
-        params.C[t][2] = 0.0;
-        params.C[t][3] = 0.0;
+            params.C[t][0] = this->dt * v * sinPhi * phi;
+            params.C[t][1] = -this->dt * v * cosPhi * phi;
+            params.C[t][2] = 0.0;
+            params.C[t][3] = 0.0;
+        }
     }
 
     params.x0[0] = state->x;
@@ -367,7 +368,6 @@ bool ModelPredictiveControl::linearMpcControl(double **xRef, double **xBar, \
 
 bool ModelPredictiveControl::iterativeMpcControl(double **xRef, State *state, \
         bool validO, double *oA, double *oDelta, int maxIters) {
-    RTRBENCH_LOOP("MPC refinement loop");
     if (!validO) {
         std::fill(oA, oA + this->T, 0);
         std::fill(oDelta, oDelta + this->T, 0);
@@ -388,9 +388,12 @@ bool ModelPredictiveControl::iterativeMpcControl(double **xRef, State *state, \
         validO = this->linearMpcControl(xRef, xBar, state, oA, oDelta);
         if (validO) {
             double dU = 0;
-            for (int j = 0; j < this->T; j++) {
-                dU += std::abs(oA[j] - prevOA[j]) + \
-                      std::abs(oDelta[j] - prevOD[j]);
+            {
+                RTRBENCH_LOOP("MPC convergence difference");
+                for (int j = 0; j < this->T; j++) {
+                    dU += std::abs(oA[j] - prevOA[j]) + \
+                          std::abs(oDelta[j] - prevOD[j]);
+                }
             }
             if (dU <= this->duTh) break;
         }

@@ -61,22 +61,23 @@ void PRM::initializeGraph(int totalSamples) {
 }
 
 void PRM::addVertice(double *cfg) {
-    RTRBENCH_LOOP("Roadmap connection loop");
     int nodeId = graph.size();
     graph.push_back(std::make_pair(cfg, std::list<int> {}));
 
-    for (int i = 0; i < nodeId /*Do not include the new node itself*/; i++) {
-        double *neighbourCfg = graph[i].first;
-        if (getNorm(neighbourCfg, cfg) > radius) continue;
-        if (!canConnect(neighbourCfg, cfg)) continue;
-        graph[i].second.push_back(nodeId);
-        graph[nodeId].second.push_back(i);
+    {
+        RTRBENCH_LOOP("Roadmap connection candidates");
+        for (int i = 0; i < nodeId /*Do not include the new node itself*/; i++) {
+            double *neighbourCfg = graph[i].first;
+            if (getNorm(neighbourCfg, cfg) > radius) continue;
+            if (!canConnect(neighbourCfg, cfg)) continue;
+            graph[i].second.push_back(nodeId);
+            graph[nodeId].second.push_back(i);
+        }
     }
 }
 
 // This function is on the critical path and should be highly optimized
 std::vector<double*> PRM::query(double *startCfg, double *goalCfg) {
-    RTRBENCH_LOOP("Roadmap search loop");
     // Add start-goal to the graph
     addVertice(startCfg);
     addVertice(goalCfg);
@@ -122,16 +123,19 @@ std::vector<double*> PRM::query(double *startCfg, double *goalCfg) {
             break;
         }
 
-        for (auto const& neighbourPos : graph[expNode->pos].second) {
-            if (visitedNodes[neighbourPos]) continue;
+        {
+            RTRBENCH_LOOP("Roadmap adjacent-edge search");
+            for (auto const& neighbourPos : graph[expNode->pos].second) {
+                if (visitedNodes[neighbourPos]) continue;
 
-            double newCost = expNode->g + getNorm(graph[expNode->pos].first, \
-                    graph[neighbourPos].first);
-            if (newCost < gValues[neighbourPos]) {
-                gValues[neighbourPos] = newCost;
-                heap.push(new Node(neighbourPos, newCost, \
-                            this->aStarWeight * getNorm(graph[neighbourPos].first, \
-                                graph[goalPos].first), expNode));
+                double newCost = expNode->g + getNorm(graph[expNode->pos].first, \
+                        graph[neighbourPos].first);
+                if (newCost < gValues[neighbourPos]) {
+                    gValues[neighbourPos] = newCost;
+                    heap.push(new Node(neighbourPos, newCost, \
+                                this->aStarWeight * getNorm(graph[neighbourPos].first, \
+                                    graph[goalPos].first), expNode));
+                }
             }
         }
     }
