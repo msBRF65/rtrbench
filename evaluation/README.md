@@ -23,16 +23,17 @@ Each benchmark uses a single linear time axis, preserving relative durations.
 The overview measures compute ROI, not input loading, build time or full-process
 elapsed time. No zero-duration bar is enlarged into positive time.
 
-The [checked example](example/REPORT.md) includes raw samples, aggregate tables and
-source/input/binary provenance from GCC 8.5.0 on an AMD Ryzen Threadripper 9970X.
-Regenerate its figures with:
+Generated result CSVs and Markdown reports stay local and are not versioned.
+Generate your own samples with `tools/measure.py`, then produce figures and
+tables with:
 
 ```sh
-python3 evaluation/plot.py evaluation/example/samples.csv --out /absolute/path/new-example-plots
+python3 evaluation/plot.py /absolute/path/new-measurement/samples.csv --out /absolute/path/new-plots
 ```
 
-The recorded git head is the base commit; source SHA-256 entries identify the
-instrumented working-tree contents used for the example. Hashes are validation
+The [checked provenance](example/manifest.json) records GCC 8.5.0 on an AMD Ryzen
+Threadripper 9970X. Its recorded git head is the base commit; source SHA-256
+entries identify the instrumented working-tree contents. Hashes are validation
 records used to identify matching code, inputs and binaries; they are not timing
 measurements. They may remain in a measurement work directory while a delivery
 folder contains just the PNGs, result tables and readable report. Timing artifacts
