@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggregate exclusive ROI samples and draw absolute-time stacked bars and details."""
+"""Aggregate exclusive ROI samples and draw PNG time bars for benchmarks and regions."""
 import argparse
 import collections
 import csv
@@ -45,68 +45,61 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
-def plot(summary, output):
+def plot(summary, roi, output):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    from matplotlib.patches import Patch
+
     rows = [row for row in summary if row['mode'] == 'instrumented']
     kernels = sorted({row['kernel'] for row in rows})
     names = sorted({row['region'] for row in rows})
-    palette = plt.get_cmap('tab20')
-    colors = {name: palette(i % 20) if i < 20 else plt.get_cmap('Set3')(i-20)
-              for i, name in enumerate(names)}
+    colors = {name: plt.get_cmap('tab20')(index % 20)
+              for index, name in enumerate(names)}
     colors['Unattributed ROI'] = '#bbbbbb'
-    values = {(row['kernel'], row['region']): row['mean_ms'] for row in rows}
-    fig, ax = plt.subplots(figsize=(19, 10))
-    bottoms = [0.0]*len(kernels)
-    maximum = max(sum(values.get((kernel, name), 0) for name in names) for kernel in kernels)
-    for name in names:
-        heights = [values.get((kernel, name), 0) for kernel in kernels]
-        ax.bar(kernels, heights, bottom=bottoms, label=name, color=colors[name], width=.75)
-        for index, height in enumerate(heights):
-            # A linear time axis cannot display microseconds next to seconds legibly.
-            # Center labels only where they fit; every positive part has its own labeled
-            # absolute-time detail panel below, without inflating the overview segments.
-            if height > maximum*.035:
-                ax.text(index, bottoms[index]+height/2, textwrap.fill(name, 16),
-                        ha='center', va='center', fontsize=7)
-            bottoms[index] += height
-    ax.set_ylabel('Exclusive ROI wall time (ms; mean of measured repetitions)')
+
+    # The overview has one ordinary bar per benchmark, without region stacking.
+    totals = {row['kernel']: row for row in roi}
+    fig, ax = plt.subplots(figsize=(15, 6))
+    means = [totals[kernel]['instrumented_mean_ms'] for kernel in kernels]
+    errors = [totals[kernel]['instrumented_population_std_ms'] for kernel in kernels]
+    ax.bar(kernels, means, yerr=errors, capsize=3, color='#4477aa')
+    ax.set_ylabel('Compute ROI wall time (ms; mean ± population std)')
     ax.set_xlabel('Benchmark (03.srec excluded)')
-    ax.set_title('Measured loop regions — absolute-time stacked overview')
+    ax.set_title('Benchmark execution time inside the compute ROI')
     ax.tick_params(axis='x', rotation=45)
-    ax.legend(loc='upper left', bbox_to_anchor=(1.01, 1), fontsize=8)
     ax.grid(axis='y', alpha=.2)
     fig.tight_layout()
-    for extension in ('svg', 'png'):
-        fig.savefig(output / ('stacked.' + extension), dpi=180)
+    fig.savefig(output / 'benchmark-times.png', dpi=180)
     plt.close(fig)
-    # Region-specific axes preserve actual time units and give every positive block a
-    # centered processing label, including tiny parts invisible on the global axis.
+
+    # One shared time axis and one PNG per benchmark. Other is always shown,
+    # including a genuine zero, so the chart accounts for the complete ROI.
     for kernel in kernels:
-        parts = sorted([row for row in rows if row['kernel'] == kernel],
+        parts = sorted([row for row in rows if row['kernel'] == kernel
+                        and row['region'] != 'Unattributed ROI'],
                        key=lambda row: row['mean_ms'], reverse=True)
-        fig, axes = plt.subplots(1, len(parts), figsize=(max(8, len(parts)*2.5), 5), squeeze=False)
-        for ax, part in zip(axes[0], parts):
-            mean, std = part['mean_ms'], part['population_std_ms']
-            ax.bar([0], [mean], color=colors[part['region']], width=.75)
-            if mean > 0:
-                ax.text(0, mean/2, textwrap.fill(part['region'], 17), ha='center', va='center', fontsize=9)
-                ax.errorbar([0], [mean], yerr=[std], color='black', capsize=4, fmt='none')
-            else:
-                ax.text(.5, .5, 'Below clock resolution\n(not proven zero work)',
-                        transform=ax.transAxes, ha='center', va='center', fontsize=9)
-            ax.set_xlim(-.6, .6)
-            ax.set_ylim(0, max((mean+std)*1.2, 1e-6))
-            ax.set_xticks([0], [kernel])
-            ax.set_ylabel('Exclusive wall time (ms)')
-            ax.set_title(f'{mean:.6g} ± {std:.2g} ms', fontsize=9)
-            ax.grid(axis='y', alpha=.2)
-        fig.suptitle(kernel + ': regions ranked by mean time (independent y scales; ± population std)')
+        other = next(row for row in rows if row['kernel'] == kernel
+                     and row['region'] == 'Unattributed ROI')
+        parts.append(other)
+        labels = [textwrap.fill('Other' if row['region'] == 'Unattributed ROI'
+                                else row['region'], 22) for row in parts]
+        means = [row['mean_ms'] for row in parts]
+        errors = [row['population_std_ms'] for row in parts]
+        fig, ax = plt.subplots(figsize=(max(8, len(parts)*2.2), 6))
+        positions = list(range(len(parts)))
+        ax.bar(positions, means, yerr=errors, capsize=4,
+               color=[colors[row['region']] for row in parts])
+        for index, (mean, std) in enumerate(zip(means, errors)):
+            ax.annotate(f'{mean:.6g}', (index, mean+std), xytext=(0, 5),
+                        textcoords='offset points', ha='center', fontsize=9)
+        ax.set_xticks(positions, labels)
+        ax.set_ylim(0, max(max(mean+std for mean, std in zip(means, errors))*1.2, 1e-6))
+        ax.set_ylabel('Exclusive compute ROI wall time (ms; mean ± population std)')
+        ax.set_xlabel('Measured processing region; Other = ROI outside named regions')
+        ax.set_title(kernel + ': time by processing region')
+        ax.grid(axis='y', alpha=.2)
         fig.tight_layout()
-        for extension in ('svg', 'png'):
-            fig.savefig(output / (kernel + '.' + extension), dpi=160)
+        fig.savefig(output / (kernel + '.png'), dpi=180)
         plt.close(fig)
 
 
@@ -130,12 +123,12 @@ def main():
              '|---|---:|---:|---:|---:|']
     for row in roi:
         lines.append('| {kernel} | {n} | {baseline_mean_ms:.6g} ± {baseline_population_std_ms:.3g} | {instrumented_mean_ms:.6g} ± {instrumented_population_std_ms:.3g} | {observed_change_percent:+.1f}% |'.format(**row))
-    lines += ['', 'The linear stacked overview does not enlarge tiny segments. Centered processing labels for every positive measured part appear in the benchmark detail plots, with independent absolute-time axes and standard-deviation whiskers.',
+    lines += ['', 'benchmark-times.png shows one ordinary mean compute-ROI bar per benchmark. Each benchmark PNG shows region names on one shared time axis, with Other for all ROI time outside the named regions. Whiskers show population standard deviation; values above bars are milliseconds. Only PNG figures are produced.',
               'regions.csv ranks the measured loop-containing regions. This is curated source instrumentation, not exhaustive automatic detection of every C++ loop. Source file/symbol coverage is in tools/regions.json and the raw samples retain callsites.',
               'Each chart describes these bundled representative inputs, not a general comparison of algorithm performance. Very short regions can be dominated by timing overhead; zero-resolution observations do not prove zero work.']
     (args.out / 'REPORT.md').write_text('\n'.join(lines)+'\n')
     if not args.tables_only:
-        plot(summary, args.out)
+        plot(summary, roi, args.out)
 
 
 if __name__ == '__main__':

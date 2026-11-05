@@ -152,5 +152,5 @@ SOFTWARE.
 [tools/README.md](tools/README.md) describes opt-in, exclusive ROI loop measurement
 and paired baseline checks for the 15 bundled workloads other than scene
 reconstruction. [evaluation/README.md](evaluation/README.md) describes reproducible
-stacked timing plots, raw statistics, and overhead/precision limits. Normal builds
+PNG timing bar charts, raw statistics, and overhead/precision limits. Normal builds
 remain uninstrumented.

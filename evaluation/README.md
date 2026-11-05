@@ -6,19 +6,22 @@ required for figures; `--tables-only` uses the standard library.
 
 Outputs:
 
-- `stacked.svg` / `stacked.png`: all 15 benchmarks, absolute mean exclusive ROI
-  milliseconds on the y axis, benchmark on the x axis, color per measured part;
-- `<benchmark>.svg` / `.png`: ranked processing blocks with centered labels,
-  independent absolute-time axes and population-standard-deviation whiskers;
+- `benchmark-times.png`: one ordinary bar per benchmark, mean compute-ROI wall
+  time on the y axis and benchmark name on the x axis;
+- `<benchmark>.png`: one chart per benchmark, measured processing names on the
+  x axis and exclusive time on a shared y axis, with population-standard-deviation
+  whiskers and an `Other` bar for ROI time outside the named regions;
 - `regions.csv`: n, mean and population std for every measured part, both modes;
 - `roi-and-overhead.csv`: per-benchmark ROI means/std and observed instrumented
   change relative to the ROI-only baseline;
 - `REPORT.md`: readable results and interpretation limits.
 
-A single linear overview cannot legibly label microsecond segments beside a
-second-long kernel. Only labels that fit are placed in that overview; the detail
-plots show every positive segment without enlarging its contribution to the
-stacked total. No zero-duration segment is drawn as positive time.
+Figures are PNG only: 15 benchmark charts and one overview. Region values are
+written above their bars in milliseconds. `Other` is the recorded `Unattributed
+ROI` category; named exclusive regions plus Other account for the entire ROI.
+Each benchmark uses a single linear time axis, preserving relative durations.
+The overview measures compute ROI, not input loading, build time or full-process
+elapsed time. No zero-duration bar is enlarged into positive time.
 
 The [checked example](example/REPORT.md) includes raw samples, aggregate tables and
 source/input/binary provenance from GCC 8.5.0 on an AMD Ryzen Threadripper 9970X.
@@ -29,5 +32,8 @@ python3 evaluation/plot.py evaluation/example/samples.csv --out /absolute/path/n
 ```
 
 The recorded git head is the base commit; source SHA-256 entries identify the
-instrumented working-tree contents used for the example. Timing artifacts are
-machine-specific observations, not performance guarantees.
+instrumented working-tree contents used for the example. Hashes are validation
+records used to identify matching code, inputs and binaries; they are not timing
+measurements. They may remain in a measurement work directory while a delivery
+folder contains just the PNGs, result tables and readable report. Timing artifacts
+are machine-specific observations, not performance guarantees.

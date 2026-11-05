@@ -74,6 +74,7 @@ Report raw instrumented timings alongside the paired ROI-only baseline, their
 means and **population** standard deviations. The observed ratio includes timer
 cost, code-layout changes and run noise; it is not an overhead correction or a
 speedup result. Tiny kernels/parts may be dominated by instrumentation. A recorded
-zero is below clock resolution, not proof of no work. The linear stacked overview
-keeps actual segment sizes; benchmark detail plots make every positive processing
-label readable at the block center. Detail axes have independent time scales.
+zero is below clock resolution, not proof of no work. The overview uses one ordinary
+compute-ROI bar per benchmark. Each benchmark has one PNG with measured processing
+names on the x axis and exclusive time on the y axis, including an Other bar for
+ROI time outside named regions. Region bars share a time axis within each chart.

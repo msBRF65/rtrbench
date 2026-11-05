@@ -22,6 +22,6 @@ Negative baseline-to-instrumented changes reflect run noise and code-layout effe
 | 15.cem | 5 | 0.0437142 ± 0.00499 | 0.0479938 ± 0.00477 | +9.8% |
 | 16.bo | 5 | 0.0417042 ± 0.00444 | 0.0473428 ± 0.00433 | +13.5% |
 
-The linear stacked overview does not enlarge tiny segments. Centered processing labels for every positive measured part appear in the benchmark detail plots, with independent absolute-time axes and standard-deviation whiskers.
+benchmark-times.png shows one ordinary mean compute-ROI bar per benchmark. Each benchmark PNG shows region names on one shared time axis, with Other for all ROI time outside the named regions. Whiskers show population standard deviation; values above bars are milliseconds. Only PNG figures are produced.
 regions.csv ranks the measured loop-containing regions. This is curated source instrumentation, not exhaustive automatic detection of every C++ loop. Source file/symbol coverage is in tools/regions.json and the raw samples retain callsites.
 Each chart describes these bundled representative inputs, not a general comparison of algorithm performance. Very short regions can be dominated by timing overhead; zero-resolution observations do not prove zero work.
