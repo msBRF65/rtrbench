@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  rtrbench:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    tty: true
+    command: /bin/bash
+    stdin_open: true
+    ports:
+      - 1015:1015        
+    volumes:
+      - ../:/home/ubuntu/rtrbench      
+      - $HOME/.Xauthority:/root/.Xauthority
+      - /etc/localtime:/etc/localtime:ro
