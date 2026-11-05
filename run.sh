@@ -10,6 +10,11 @@ SELECTED=()
 SKIPPED=()
 BUILD=false
 DRY_RUN=false
+EVALUATE=true
+EVALUATION_PYTHON=${RTRBENCH_PYTHON:-python3}
+BINARY_ROOT=${RTRBENCH_BINARY_ROOT:-$ROOT}
+EXTERNAL_BINARIES=false
+[[ -z ${RTRBENCH_BINARY_ROOT:-} ]] || EXTERNAL_BINARIES=true
 JOBS=2
 ARM_SAMPLES=1000
 SCENE_FRAMES=10
@@ -23,7 +28,9 @@ usage() {
 Usage: ./run.sh [options]
 Run all 16 kernels sequentially, once each, using the bundled example inputs.
 
-  --build               Build selected kernels before running (once per directory)
+  --build               Build selected kernels (automatic with evaluation enabled)
+  --no-evaluation       Benchmark only; use ordinary binaries and optional --build
+  --python PATH         Python with matplotlib for automatic evaluation (default: python3)
   --jobs N              Parallel make jobs per build directory (default: 2)
   --kernel NAME         Run only NAME; repeat to select several kernels
   --skip NAME           Explicitly skip NAME; repeat to skip several kernels
@@ -47,13 +54,15 @@ fail_usage() {
 while (($#)); do
     case "$1" in
         --build) BUILD=true; shift ;;
+        --no-evaluation) EVALUATE=false; shift ;;
         --dry-run) DRY_RUN=true; shift ;;
         --list) printf '%s\n' "${KERNELS[@]}"; exit 0 ;;
         -h|--help) usage; exit 0 ;;
-        --jobs|--kernel|--skip|--scene-dir|--camera|--scene-frames|--arm-samples|--output-dir)
+        --jobs|--kernel|--skip|--scene-dir|--camera|--scene-frames|--arm-samples|--output-dir|--python)
             (($# >= 2)) && [[ -n "$2" ]] || fail_usage "$1 requires a value"
             case "$1" in
                 --jobs) JOBS=$2 ;;
+                --python) EVALUATION_PYTHON=$2 ;;
                 --kernel) SELECTED+=("$2") ;;
                 --skip) SKIPPED+=("$2") ;;
                 --scene-dir) SCENE_DIR=$2 ;;
@@ -84,6 +93,13 @@ done
 [[ "$CAMERA" == /* ]] || CAMERA="$PWD/$CAMERA"
 [[ -n "$OUTPUT" ]] || OUTPUT="$ROOT/results/$(date +%Y%m%d-%H%M%S)-$$"
 [[ "$OUTPUT" == /* ]] || OUTPUT="$PWD/$OUTPUT"
+
+if [[ "$EVALUATION_PYTHON" == */* && "$EVALUATION_PYTHON" != /* ]]; then
+    EVALUATION_PYTHON="$PWD/$EVALUATION_PYTHON"
+fi
+if "$EVALUATE" && ! "$EXTERNAL_BINARIES"; then
+    BINARY_ROOT="$OUTPUT/build"
+fi
 
 is_skipped() {
     local name=$1 skip_name
@@ -158,7 +174,7 @@ configure_kernel() {
     esac
     # The kernels' argument parser cannot read path values containing spaces.
     # Relative symlinks keep caller/input/output paths independent of that parser.
-    COMMAND=("${RTRBENCH_BINARY_ROOT:-$ROOT}/$DIRECTORY/$BINARY")
+    COMMAND=("$BINARY_ROOT/$DIRECTORY/$BINARY")
     LINK_NAMES=()
     LINK_SOURCES=()
     for argument in "${ARGS[@]}"; do
@@ -184,14 +200,22 @@ print_command() {
 run_kernel() {
     local name=$1 input index
     configure_kernel "$name"
-    if "$BUILD" && [[ ! ${BUILD_STATUS[$DIRECTORY]+present} ]]; then
-        if make -C "$ROOT/$DIRECTORY" -j "$JOBS" > "$OUTPUT/build-${DIRECTORY//\//-}.log" 2>&1; then
+    if { "$BUILD" || { "$EVALUATE" && ! "$EXTERNAL_BINARIES"; }; } &&
+       [[ ! ${BUILD_STATUS[$DIRECTORY]+present} ]]; then
+        local build_command=(make -C "$ROOT/$DIRECTORY" -j "$JOBS")
+        if "$EVALUATE"; then
+            local target="$BINARY_ROOT/$DIRECTORY"
+            mkdir -p "$target" || return 1
+            build_command+=("CXX=${CXX:-g++} -DRTRBENCH_MEASURE_LOOPS"
+                            "BIN_DIR=$target" "OBJ_DIR=$target/obj")
+        fi
+        if "${build_command[@]}" > "$OUTPUT/build-${DIRECTORY//\//-}.log" 2>&1; then
             BUILD_STATUS[$DIRECTORY]=0
         else
             BUILD_STATUS[$DIRECTORY]=$?
         fi
     fi
-    if "$BUILD" && [[ ${BUILD_STATUS[$DIRECTORY]} != 0 ]]; then
+    if [[ ${BUILD_STATUS[$DIRECTORY]:-0} != 0 ]]; then
         printf 'Build failed for %s; see build log\n' "$DIRECTORY" >&2
         return "${BUILD_STATUS[$DIRECTORY]}"
     fi
@@ -228,6 +252,15 @@ if "$DRY_RUN"; then
 fi
 
 [[ ! -e "$OUTPUT" ]] || fail_usage "output directory already exists: $OUTPUT"
+if "$EVALUATE"; then
+    if "$EXTERNAL_BINARIES" && "$BUILD"; then
+        fail_usage "do not combine --build with RTRBENCH_BINARY_ROOT; supply already timed binaries"
+    fi
+    if ! "$EXTERNAL_BINARIES" && [[ "$ROOT" =~ [[:space:]] || "$OUTPUT" =~ [[:space:]] ]]; then
+        fail_usage "instrumented GNU make build paths must not contain whitespace; use --no-evaluation for ordinary runs"
+    fi
+    "$EVALUATION_PYTHON" "$ROOT/evaluation/collect.py" --preflight || exit 1
+fi
 mkdir -p "$OUTPUT" || exit 1
 printf 'kernel\tstatus\texit_code\tconsole_log\n' > "$OUTPUT/summary.tsv"
 passed=0
@@ -252,4 +285,14 @@ for name in "${SELECTED[@]}"; do
     printf '  %s\n' "$status"
 done
 printf '%d passed; %d failed; %d skipped. Results: %s\n' "$passed" "$failed" "$skipped" "$OUTPUT"
-((failed == 0))
+evaluation_failed=0
+if "$EVALUATE"; then
+    printf 'Generating evaluation PNGs and report...\n'
+    if ! "$EVALUATION_PYTHON" "$ROOT/evaluation/collect.py" "$OUTPUT" > "$OUTPUT/evaluation.log" 2>&1; then
+        printf 'Evaluation failed; inspect %s/evaluation/REPORT.md and evaluation.log\n' "$OUTPUT" >&2
+        evaluation_failed=1
+    else
+        printf 'Evaluation: %s/evaluation\n' "$OUTPUT"
+    fi
+fi
+((failed == 0 && evaluation_failed == 0))

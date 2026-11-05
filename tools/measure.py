@@ -99,7 +99,7 @@ def main():
             env = dict(os.environ, RTRBENCH_BINARY_ROOT=str(binaries[mode]))
             start = time.monotonic()
             print('Run', trial, mode, flush=True)
-            run(['bash', str(ROOT / 'run.sh'), '--skip', '03.srec', '--output-dir', str(destination)],
+            run(['bash', str(ROOT / 'run.sh'), '--no-evaluation', '--skip', '03.srec', '--output-dir', str(destination)],
                 destination.parent / (mode + '.log'), env)
             manifest['results'].append({'trial': trial, 'mode': mode,
                                         'suite_process_wall_s': time.monotonic()-start})

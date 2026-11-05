@@ -78,3 +78,11 @@ zero is below clock resolution, not proof of no work. The overview uses one ordi
 compute-ROI bar per benchmark. Each benchmark has one PNG with measured processing
 names on the x axis and exclusive time on the y axis, including an Other bar for
 ROI time outside named regions. Region bars share a time axis within each chart.
+
+## Root runner integration
+
+The root `run.sh` now defaults to a single timed process per selected benchmark and
+automatic local PNG/report generation. Use `--no-evaluation` for the original
+benchmark-only mode. This paired-repeat driver explicitly passes that flag for
+its internal invocations, so it does not recursively trigger extra plots or builds.
+The root runner's ordinary automatic path does not run this repeated experiment.
