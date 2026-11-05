@@ -124,35 +124,38 @@ int main(int argc, const char **argv) {
     // ROI begins
     zsim_roi_begin();
 
-    while (t <= T) {
-        t += dt;
+    {
+        RTRBENCH_LOOP("DMP integration and basis loops");
+        while (t <= T) {
+            t += dt;
 
-        // Compute the basis function values and force term
-        double sum = 0;
-        std::vector<double> Phi;
-        for (auto c : C) {
-            double p = exp(-0.5 * ((t/T-c)*(t/T-c) / H));
-            Phi.push_back(p);
+            // Compute the basis function values and force term
+            double sum = 0;
+            std::vector<double> Phi;
+            for (auto c : C) {
+                double p = exp(-0.5 * ((t/T-c)*(t/T-c) / H));
+                Phi.push_back(p);
 
-            sum += p;
+                sum += p;
+            }
+
+            for (int i = 0; i < static_cast<int>(Phi.size()); i++) {
+                Phi[i] /= sum;
+            }
+
+            double f = 0;
+            assert(Phi.size() == weights.size());
+            for (int i = 0; i < static_cast<int>(weights.size()); i++) {
+                f += Phi[i] * weights[i];
+            }
+
+            qdd = K*(g-q)/(T*T) - B*qd/T + (g-q0)*f/(T*T);
+            qd += qdd*dt;
+            q += qd*dt;
+
+            Traj.push_back(q);
+            execTime.push_back(t);
         }
-
-        for (int i = 0; i < static_cast<int>(Phi.size()); i++) {
-            Phi[i] /= sum;
-        }
-
-        double f = 0;
-        assert(Phi.size() == weights.size());
-        for (int i = 0; i < static_cast<int>(weights.size()); i++) {
-            f += Phi[i] * weights[i];
-        }
-
-        qdd = K*(g-q)/(T*T) - B*qd/T + (g-q0)*f/(T*T);
-        qd += qdd*dt;
-        q += qd*dt;
-
-        Traj.push_back(q);
-        execTime.push_back(t);
     }
 
     zsim_roi_end();

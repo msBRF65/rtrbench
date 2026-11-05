@@ -192,15 +192,18 @@ int main(int argc, const char **argv) {
 
         policiesLog.push_back(policyMu);
 
-        for (int s = 0; s < numSamples; s++) {
-            auto sampledParams = sample(policyMu, policyCov);
-            auto d = gp->test(sampledParams);
+        {
+            RTRBENCH_LOOP("Policy sample and reward loop");
+            for (int s = 0; s < numSamples; s++) {
+                auto sampledParams = sample(policyMu, policyCov);
+                auto d = gp->test(sampledParams);
 
-            // Compute UCB acquisition function value
-            auto acquisition = d.first + beta * d.second;
+                // Compute UCB acquisition function value
+                auto acquisition = d.first + beta * d.second;
 
-            skillParams.push_back(sampledParams);
-            rewards.push_back(acquisition);
+                skillParams.push_back(sampledParams);
+                rewards.push_back(acquisition);
+            }
         }
 
         // CEM fitting of next distribution
@@ -209,35 +212,41 @@ int main(int argc, const char **argv) {
 
         double rewardThreshold = sortedRewards[numSamples - topN];
         std::vector<int> chosenIndices;
-        for (int i = 0; i < numSamples; i++) {
-            if (rewards[i] >= rewardThreshold) {
-                chosenIndices.push_back(i);
-                if (static_cast<int>(chosenIndices.size()) == topN) break;
+        {
+            RTRBENCH_LOOP("Elite selection loop");
+            for (int i = 0; i < numSamples; i++) {
+                if (rewards[i] >= rewardThreshold) {
+                    chosenIndices.push_back(i);
+                    if (static_cast<int>(chosenIndices.size()) == topN) break;
+                }
             }
         }
 
         assert(static_cast<int>(chosenIndices.size()) == topN);
 
         // Update policy
-        for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {
-            // Update mean
-            double sum = policyMu[i];
-            for (auto idx : chosenIndices) {
-                assert(idx < static_cast<int>(skillParams.size()));
-                sum += skillParams[idx][i];
-            }
-            double mean = sum / (1 + topN);
+        {
+            RTRBENCH_LOOP("Policy distribution fit loop");
+            for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {
+                // Update mean
+                double sum = policyMu[i];
+                for (auto idx : chosenIndices) {
+                    assert(idx < static_cast<int>(skillParams.size()));
+                    sum += skillParams[idx][i];
+                }
+                double mean = sum / (1 + topN);
 
-            // Update variance
-            double var = (policyMu[i] - mean) * (policyMu[i] - mean);
-            for (auto idx : chosenIndices) {
-                var += (skillParams[idx][i] - mean) * \
-                       (skillParams[idx][i] - mean);
-            }
-            var /= (1 + topN);
+                // Update variance
+                double var = (policyMu[i] - mean) * (policyMu[i] - mean);
+                for (auto idx : chosenIndices) {
+                    var += (skillParams[idx][i] - mean) * \
+                           (skillParams[idx][i] - mean);
+                }
+                var /= (1 + topN);
 
-            policyMu[i] = mean;
-            policyCov[i] = var;
+                policyMu[i] = mean;
+                policyCov[i] = var;
+            }
         }
     }
 

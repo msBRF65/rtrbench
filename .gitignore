@@ -4,3 +4,10 @@
 verify_all.sh
 build.log
 /results/
+
+# Python tooling cache
+__pycache__/
+
+# Machine-specific measurement results stay local.
+/evaluation/example/*.csv
+/evaluation/example/REPORT.md

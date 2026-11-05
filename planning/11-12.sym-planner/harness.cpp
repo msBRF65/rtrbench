@@ -40,6 +40,7 @@
 #include "zsim_hooks.h"
 
 list<GroundedAction> plan(Environment* env, int aStarWeight) {
+    RTRBENCH_LOOP("Symbolic A-star action loop");
     State startState = env->getStartConds();
     State goalState = env->getGoalConds();
     int maxAddedLiterals = env->getMaxAddedLiterals();

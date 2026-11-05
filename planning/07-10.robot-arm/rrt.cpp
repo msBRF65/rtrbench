@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -52,6 +53,7 @@ RRT::~RRT() {
 }
 
 std::vector<double*> RRT::query(double *startCfg, double *goalCfg) {
+    RTRBENCH_LOOP("RRT sampling and path loops");
     auto generateRandomRatio = []() {
         return static_cast<double>(rand()) / RAND_MAX;
     };

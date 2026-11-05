@@ -1,0 +1,164 @@
+[
+  {
+    "file": "perception/01.pfl/pfilter.cpp",
+    "symbol": "ParticleFilter::updateMotion",
+    "label": "Motion particle loop",
+    "line": 98
+  },
+  {
+    "file": "perception/01.pfl/pfilter.cpp",
+    "symbol": "ParticleFilter::updateSensor",
+    "label": "Sensor particle and ray loops",
+    "line": 158
+  },
+  {
+    "file": "perception/01.pfl/pfilter.cpp",
+    "symbol": "ParticleFilter::resample",
+    "label": "Particle resampling loops",
+    "line": 250
+  },
+  {
+    "file": "perception/02.ekfslam/ekf.cpp",
+    "symbol": "ExtKalmanFillter::predict",
+    "label": "State prediction matrix loops",
+    "line": 202
+  },
+  {
+    "file": "perception/02.ekfslam/ekf.cpp",
+    "symbol": "ExtKalmanFillter::update",
+    "label": "Landmark update matrix loops",
+    "line": 287
+  },
+  {
+    "file": "planning/astar-bare/astar_bare.cpp",
+    "symbol": "AStar::run",
+    "label": "A-star expansion loop",
+    "line": 53
+  },
+  {
+    "file": "planning/06.movtar/harness.cpp",
+    "symbol": "backwardDijkstra2D",
+    "label": "Backward Dijkstra loop",
+    "line": 64
+  },
+  {
+    "file": "planning/06.movtar/harness.cpp",
+    "symbol": "aStar3D",
+    "label": "Time-space A-star loop",
+    "line": 170
+  },
+  {
+    "file": "planning/07-10.robot-arm/prm.cpp",
+    "symbol": "PRM::query",
+    "label": "Roadmap search loop",
+    "line": 79
+  },
+  {
+    "file": "planning/07-10.robot-arm/prm.cpp",
+    "symbol": "PRM::addVertice",
+    "label": "Roadmap connection loop",
+    "line": 64
+  },
+  {
+    "file": "planning/07-10.robot-arm/rrt.cpp",
+    "symbol": "RRT::query",
+    "label": "RRT sampling and path loops",
+    "line": 56
+  },
+  {
+    "file": "planning/07-10.robot-arm/rrt_star.cpp",
+    "symbol": "RRTStar::query",
+    "label": "RRT-star sampling loop",
+    "line": 55
+  },
+  {
+    "file": "planning/07-10.robot-arm/planner.cpp",
+    "symbol": "Planner::canConnect",
+    "label": "Configuration interpolation loop",
+    "line": 250
+  },
+  {
+    "file": "planning/11-12.sym-planner/harness.cpp",
+    "symbol": "plan",
+    "label": "Symbolic A-star action loop",
+    "line": 43
+  },
+  {
+    "file": "planning/11-12.sym-planner/env.cpp",
+    "symbol": "Environment::getAllGroundedActs",
+    "label": "Action grounding loops",
+    "line": 283
+  },
+  {
+    "file": "control/14.mpc/mpc.cpp",
+    "symbol": "ModelPredictiveControl::simulate",
+    "label": "MPC simulation loop",
+    "line": 72
+  },
+  {
+    "file": "control/14.mpc/mpc.cpp",
+    "symbol": "ModelPredictiveControl::iterativeMpcControl",
+    "label": "MPC refinement loop",
+    "line": 370
+  },
+  {
+    "file": "control/14.mpc/mpc.cpp",
+    "symbol": "ModelPredictiveControl::linearMpcControl",
+    "label": "QP assembly and solver loops",
+    "line": 295
+  },
+  {
+    "file": "control/13.dmp/harness.cpp",
+    "symbol": "while (t <= T)",
+    "label": "DMP integration and basis loops",
+    "line": 128
+  },
+  {
+    "file": "control/15.cem/harness.cpp",
+    "symbol": "for (int s = 0; s < numSamples; s++)",
+    "label": "Policy sample and reward loop",
+    "line": 175
+  },
+  {
+    "file": "control/15.cem/harness.cpp",
+    "symbol": "for (int i = 0; i < numSamples; i++)",
+    "label": "Elite selection loop",
+    "line": 201
+  },
+  {
+    "file": "control/15.cem/harness.cpp",
+    "symbol": "for (int i = 0; i < static_cast<int>(policyMu.size()); i++)",
+    "label": "Policy distribution fit loop",
+    "line": 214
+  },
+  {
+    "file": "control/16.bo/harness.cpp",
+    "symbol": "for (int s = 0; s < numSamples; s++)",
+    "label": "Policy sample and reward loop",
+    "line": 196
+  },
+  {
+    "file": "control/16.bo/harness.cpp",
+    "symbol": "for (int i = 0; i < numSamples; i++)",
+    "label": "Elite selection loop",
+    "line": 216
+  },
+  {
+    "file": "control/16.bo/harness.cpp",
+    "symbol": "for (int i = 0; i < static_cast<int>(policyMu.size()); i++)",
+    "label": "Policy distribution fit loop",
+    "line": 229
+  },
+  {
+    "file": "control/16.bo/gauss_proc.cpp",
+    "symbol": "GaussianProcess::train",
+    "label": "Gaussian process training loops",
+    "line": 57
+  },
+  {
+    "file": "control/16.bo/gauss_proc.cpp",
+    "symbol": "GaussianProcess::test",
+    "label": "Gaussian process prediction loops",
+    "line": 114
+  }
+]

@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -198,6 +199,7 @@ ExtKalmanFillter::~ExtKalmanFillter() {
 }
 
 void ExtKalmanFillter::predict(double d, double alpha) {
+    RTRBENCH_LOOP("State prediction matrix loops");
     double xT = this->X[0], yT = this->X[1], thetaT = this->X[2];
     this->X[0] = xT + d*cos(thetaT);
     this->X[1] = yT + d*sin(thetaT);
@@ -282,6 +284,7 @@ void ExtKalmanFillter::predict(double d, double alpha) {
 }
 
 void ExtKalmanFillter::update(const std::vector<double> &measure) {
+    RTRBENCH_LOOP("Landmark update matrix loops");
     assert(this->numLandmarks * 2 == static_cast<int>(measure.size()));
 
     for (int l = 0; l < this->numLandmarks; l++) {

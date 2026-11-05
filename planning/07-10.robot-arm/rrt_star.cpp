@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -51,6 +52,7 @@ RRTStar::~RRTStar() {
 }
 
 std::vector<double*> RRTStar::query(double *startCfg, double *goalCfg) {
+    RTRBENCH_LOOP("RRT-star sampling loop");
     auto generateRandomRatio = []() {
         return static_cast<double>(rand()) / RAND_MAX;
     };

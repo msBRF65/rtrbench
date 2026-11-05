@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -53,6 +54,7 @@ GaussianProcess::~GaussianProcess() {
 
 void GaussianProcess::train(const std::vector<PARAM> &x, \
         const std::vector<double> &y) {
+    RTRBENCH_LOOP("Gaussian process training loops");
     // Clear data structures
     assert(this->xTrain.size() == this->yTrain.size());
     if (!this->xTrain.empty()) {
@@ -109,6 +111,7 @@ void GaussianProcess::train(const std::vector<PARAM> &x, \
 }
 
 std::pair<double, double> GaussianProcess::test(const PARAM &x) const {
+    RTRBENCH_LOOP("Gaussian process prediction loops");
     int l = static_cast<int>(this->xTrain.size());
 
     double **kVec = new double*[1];
