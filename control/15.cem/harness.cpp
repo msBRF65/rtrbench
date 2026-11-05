@@ -171,22 +171,25 @@ int main(int argc, const char **argv) {
 
         policiesLog.push_back(policyMu);
 
-        for (int s = 0; s < numSamples; s++) {
-            auto sampledParams = sample(policyMu, policyCov);
+        {
+            RTRBENCH_LOOP("Policy sample and reward loop");
+            for (int s = 0; s < numSamples; s++) {
+                auto sampledParams = sample(policyMu, policyCov);
 
-            // Exclude from ROI: the following function
-            // *fakes* the actual rollout.  This is
-            // supposed to happen in the real world, and
-            // its latency heavily depends on the
-            // mechanics, not computation.
-            zsim_roi_end();
-            auto projectedPos = getPosition(sampledParams);
-            zsim_roi_begin();
+                // Exclude from ROI: the following function
+                // *fakes* the actual rollout.  This is
+                // supposed to happen in the real world, and
+                // its latency heavily depends on the
+                // mechanics, not computation.
+                zsim_roi_end();
+                auto projectedPos = getPosition(sampledParams);
+                zsim_roi_begin();
 
-            auto reward = getReward(projectedPos);
+                auto reward = getReward(projectedPos);
 
-            skillParams.push_back(sampledParams);
-            rewards.push_back(reward);
+                skillParams.push_back(sampledParams);
+                rewards.push_back(reward);
+            }
         }
 
         std::vector<double> sortedRewards(rewards);
@@ -194,35 +197,41 @@ int main(int argc, const char **argv) {
 
         double rewardThreshold = sortedRewards[numSamples - topN];
         std::vector<int> chosenIndices;
-        for (int i = 0; i < numSamples; i++) {
-            if (rewards[i] >= rewardThreshold) {
-                chosenIndices.push_back(i);
-                if (static_cast<int>(chosenIndices.size()) == topN) break;
+        {
+            RTRBENCH_LOOP("Elite selection loop");
+            for (int i = 0; i < numSamples; i++) {
+                if (rewards[i] >= rewardThreshold) {
+                    chosenIndices.push_back(i);
+                    if (static_cast<int>(chosenIndices.size()) == topN) break;
+                }
             }
         }
 
         assert(static_cast<int>(chosenIndices.size()) == topN);
 
         // Update policy
-        for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {
-            // Update mean
-            double sum = policyMu[i];
-            for (auto idx : chosenIndices) {
-                assert(idx < static_cast<int>(skillParams.size()));
-                sum += skillParams[idx][i];
-            }
-            double mean = sum / (1 + topN);
+        {
+            RTRBENCH_LOOP("Policy distribution fit loop");
+            for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {
+                // Update mean
+                double sum = policyMu[i];
+                for (auto idx : chosenIndices) {
+                    assert(idx < static_cast<int>(skillParams.size()));
+                    sum += skillParams[idx][i];
+                }
+                double mean = sum / (1 + topN);
 
-            // Update variance
-            double var = (policyMu[i] - mean) * (policyMu[i] - mean);
-            for (auto idx : chosenIndices) {
-                var += (skillParams[idx][i] - mean) * \
-                       (skillParams[idx][i] - mean);
-            }
-            var /= (1 + topN);
+                // Update variance
+                double var = (policyMu[i] - mean) * (policyMu[i] - mean);
+                for (auto idx : chosenIndices) {
+                    var += (skillParams[idx][i] - mean) * \
+                           (skillParams[idx][i] - mean);
+                }
+                var /= (1 + topN);
 
-            policyMu[i] = mean;
-            policyCov[i] = var;
+                policyMu[i] = mean;
+                policyCov[i] = var;
+            }
         }
     }
 

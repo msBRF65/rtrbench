@@ -158,7 +158,7 @@ configure_kernel() {
     esac
     # The kernels' argument parser cannot read path values containing spaces.
     # Relative symlinks keep caller/input/output paths independent of that parser.
-    COMMAND=("$ROOT/$DIRECTORY/$BINARY")
+    COMMAND=("${RTRBENCH_BINARY_ROOT:-$ROOT}/$DIRECTORY/$BINARY")
     LINK_NAMES=()
     LINK_SOURCES=()
     for argument in "${ARGS[@]}"; do
@@ -211,7 +211,7 @@ run_kernel() {
         ln -s -- "${LINK_SOURCES[$index]}" "$OUTPUT/$name/${LINK_NAMES[$index]}" || return 1
     done
     print_command "${COMMAND[@]}" > "$OUTPUT/$name/command.txt"
-    (cd -- "$OUTPUT/$name" && "${COMMAND[@]}")
+    (cd -- "$OUTPUT/$name" && RTRBENCH_TIMING_FILE="$OUTPUT/$name/loops.csv" "${COMMAND[@]}")
 }
 
 if "$DRY_RUN"; then

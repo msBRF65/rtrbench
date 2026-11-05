@@ -4,3 +4,6 @@
 verify_all.sh
 build.log
 /results/
+
+# Python tooling cache
+__pycache__/

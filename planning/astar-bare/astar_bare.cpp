@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -49,6 +50,7 @@ AStar::AStar(STATE initial, STATE goal, double hWeight) {
 }
 
 PATH AStar::run(uint64_t maxExpansions) {
+    RTRBENCH_LOOP("A-star expansion loop");
     MIN_HEAP openList;
     BaseEPS<STATE> *visited = nullptr;
     if (this->initState.size() <= 3) {

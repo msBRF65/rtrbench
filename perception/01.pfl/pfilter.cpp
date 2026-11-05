@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -94,6 +95,7 @@ void ParticleFilter::initializeMotionModel() {
 
 void ParticleFilter::updateMotion(READING *prevOdometry, \
         READING *currOdometry) {
+    RTRBENCH_LOOP("Motion particle loop");
     double xDiff = currOdometry->at(0) - prevOdometry->at(0);
     double yDiff = currOdometry->at(1) - prevOdometry->at(1);
     double thetaDiff = currOdometry->at(2) - prevOdometry->at(2);
@@ -153,6 +155,7 @@ void ParticleFilter::initializeSensorModel() {
 }
 
 void ParticleFilter::updateSensor(READING *laserReading) {
+    RTRBENCH_LOOP("Sensor particle and ray loops");
     for (int i = 0; i < this->numParticles; i++) {
         double x = this->particles[i].x;
         double y = this->particles[i].y;
@@ -244,6 +247,7 @@ void ParticleFilter::initializeResampler() {
 }
 
 void ParticleFilter::resample() {
+    RTRBENCH_LOOP("Particle resampling loops");
     // Low-variance sampling
 
     double wSum = 0;

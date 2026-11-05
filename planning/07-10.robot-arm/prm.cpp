@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -60,6 +61,7 @@ void PRM::initializeGraph(int totalSamples) {
 }
 
 void PRM::addVertice(double *cfg) {
+    RTRBENCH_LOOP("Roadmap connection loop");
     int nodeId = graph.size();
     graph.push_back(std::make_pair(cfg, std::list<int> {}));
 
@@ -74,6 +76,7 @@ void PRM::addVertice(double *cfg) {
 
 // This function is on the critical path and should be highly optimized
 std::vector<double*> PRM::query(double *startCfg, double *goalCfg) {
+    RTRBENCH_LOOP("Roadmap search loop");
     // Add start-goal to the graph
     addVertice(startCfg);
     addVertice(goalCfg);

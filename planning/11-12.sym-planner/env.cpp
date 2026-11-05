@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -279,6 +280,7 @@ Action Environment::getAction(string name) const {
 }
 
 Actions Environment::getAllGroundedActs() const {
+    RTRBENCH_LOOP("Action grounding loops");
     Actions allGroundedActs;
 
     for (Action act : this->actions) {

@@ -1,0 +1,65 @@
+kernel,mode,region,n,mean_ms,population_std_ms
+01.pfl,baseline,Unattributed ROI,5,15.0967444,0.5918088256522033
+01.pfl,instrumented,Motion particle loop,5,0.107926,0.0023764247936764143
+01.pfl,instrumented,Particle resampling loops,5,0.0529202,0.0031888742465014212
+01.pfl,instrumented,Sensor particle and ray loops,5,15.314796,0.0813208973069042
+01.pfl,instrumented,Unattributed ROI,5,0.013533,0.0002537234715196843
+02.ekfslam,baseline,Unattributed ROI,5,0.6116826,0.02182807080435647
+02.ekfslam,instrumented,Landmark update matrix loops,5,0.5091856,0.01811423901354953
+02.ekfslam,instrumented,State prediction matrix loops,5,0.014085799999999999,0.0015363097864688623
+02.ekfslam,instrumented,Unattributed ROI,5,0.0053232,0.0003355415920567822
+04.pp2d,baseline,Unattributed ROI,5,245.7823534,6.810649820557697
+04.pp2d,instrumented,A-star expansion loop,5,248.5078398,8.7562034555392
+04.pp2d,instrumented,Unattributed ROI,5,0.001548,4.630766675184572e-05
+05.pp3d,baseline,Unattributed ROI,5,0.328453,0.010526362885631491
+05.pp3d,instrumented,A-star expansion loop,5,0.3178598,0.01160738022811349
+05.pp3d,instrumented,Unattributed ROI,5,0.0010494,7.341552969229326e-05
+06.movtar,baseline,Unattributed ROI,5,1295.903936,30.360895761592076
+06.movtar,instrumented,Backward Dijkstra loop,5,11.3249532,0.2757144517622535
+06.movtar,instrumented,Time-space A-star loop,5,1316.0935028,27.016818750575105
+06.movtar,instrumented,Unattributed ROI,5,0.0053076,0.0003897181545681443
+07.prm,baseline,Unattributed ROI,5,3.9722768,0.029306050149414488
+07.prm,instrumented,Configuration interpolation loop,5,3.0908463999999998,0.1286433318638786
+07.prm,instrumented,Roadmap connection loop,5,0.3612866,0.015488314738537571
+07.prm,instrumented,Roadmap search loop,5,0.4797472,0.13456203919144508
+07.prm,instrumented,Unattributed ROI,5,0.0014904,0.00028236614527949345
+08.rrt,baseline,Unattributed ROI,5,8.9341192,0.2735447054646829
+08.rrt,instrumented,Configuration interpolation loop,5,1.9071816,0.07677150633040879
+08.rrt,instrumented,RRT sampling and path loops,5,7.1198858000000005,0.31387216747867286
+08.rrt,instrumented,Unattributed ROI,5,0.001768,0.00010662645075214685
+09.rrtstar,baseline,Unattributed ROI,5,27.2236392,0.7687053499622332
+09.rrtstar,instrumented,Configuration interpolation loop,5,18.694628599999998,0.8009065661145746
+09.rrtstar,instrumented,RRT-star sampling loop,5,8.7026364,0.3818022832166408
+09.rrtstar,instrumented,Unattributed ROI,5,0.0014882,0.00014830697893221346
+10.rrtpp,baseline,Unattributed ROI,5,14.820154,0.503330817341835
+10.rrtpp,instrumented,Configuration interpolation loop,5,3.235634,0.1389142876107421
+10.rrtpp,instrumented,RRT sampling and path loops,5,11.5900854,0.4826694862236893
+10.rrtpp,instrumented,Unattributed ROI,5,0.0011074,0.00012289768101961888
+11.sym-blkw,baseline,Unattributed ROI,5,0.9645926,0.031220463402070107
+11.sym-blkw,instrumented,Action grounding loops,5,0.38156660000000003,0.020112847074444735
+11.sym-blkw,instrumented,Symbolic A-star action loop,5,0.5898742,0.02398195706275865
+11.sym-blkw,instrumented,Unattributed ROI,5,0.001246,0.00012076423311560425
+12.sym-fext,baseline,Unattributed ROI,5,242.1046226,5.959545382455662
+12.sym-fext,instrumented,Action grounding loops,5,0.9453558000000001,0.023836417787914368
+12.sym-fext,instrumented,Symbolic A-star action loop,5,251.4904722,4.2310672272064185
+12.sym-fext,instrumented,Unattributed ROI,5,0.0007668,0.00027716955099721906
+13.dmp,baseline,Unattributed ROI,5,0.018548000000000002,0.004847821160067685
+13.dmp,instrumented,DMP integration and basis loops,5,0.016871,0.0040083293277873265
+13.dmp,instrumented,Unattributed ROI,5,0.0009278,8.928023297460642e-05
+14.mpc,baseline,Unattributed ROI,5,16.4417482,0.6317066060108604
+14.mpc,instrumented,MPC refinement loop,5,0.1728294,0.005554297925030669
+14.mpc,instrumented,MPC simulation loop,5,0.0620032,0.0026837372002489345
+14.mpc,instrumented,QP assembly and solver loops,5,16.440691,0.6203927936525374
+14.mpc,instrumented,Unattributed ROI,5,0.001029,4.833218389437832e-05
+15.cem,baseline,Unattributed ROI,5,0.0437142,0.004985768562619006
+15.cem,instrumented,Elite selection loop,5,0.0008772,4.278036932986904e-05
+15.cem,instrumented,Policy distribution fit loop,5,0.0005724,3.777088826066975e-05
+15.cem,instrumented,Policy sample and reward loop,5,0.0430984,0.0047884301644693554
+15.cem,instrumented,Unattributed ROI,5,0.0034458,0.00019605244196387866
+16.bo,baseline,Unattributed ROI,5,0.0417042,0.004435775170136555
+16.bo,instrumented,Elite selection loop,5,0.0007668,3.380769143257199e-05
+16.bo,instrumented,Gaussian process prediction loops,5,0.0106724,0.0006399564360173275
+16.bo,instrumented,Gaussian process training loops,5,0.002123,4.979959839195485e-05
+16.bo,instrumented,Policy distribution fit loop,5,0.00042459999999999997,3.571890255872932e-05
+16.bo,instrumented,Policy sample and reward loop,5,0.029932399999999998,0.003732631168492274
+16.bo,instrumented,Unattributed ROI,5,0.0034235999999999997,0.00012824445407112148

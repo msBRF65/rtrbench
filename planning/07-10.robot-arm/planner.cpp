@@ -1,3 +1,4 @@
+#include "zsim_hooks.h"
 /** $lic$
  * Copyright (c) 2022 Carnegie Mellon University
  *
@@ -246,6 +247,7 @@ double *Planner::getMiddleCfg(double *cfg1, double *cfg2, int sampleNumber,
 }
 
 bool Planner::canConnect(double *cfg1, double *cfg2) const {
+    RTRBENCH_LOOP("Configuration interpolation loop");
     assert(isValidArmConfiguration(cfg1));
     assert(isValidArmConfiguration(cfg2));
 

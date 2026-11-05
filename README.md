@@ -146,3 +146,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Compute-loop timing
+
+[tools/README.md](tools/README.md) describes opt-in, exclusive ROI loop measurement
+and paired baseline checks for the 15 bundled workloads other than scene
+reconstruction. [evaluation/README.md](evaluation/README.md) describes reproducible
+stacked timing plots, raw statistics, and overhead/precision limits. Normal builds
+remain uninstrumented.

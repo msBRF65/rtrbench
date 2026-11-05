@@ -61,6 +61,7 @@ void outputPath(std::string fileName) {
 }
 
 void backwardDijkstra2D(Environment *env) {
+    RTRBENCH_LOOP("Backward Dijkstra loop");
     // Run Dijkstra to get the G values of nodes in 2D. At the beginning, put
     // ALL points of target's trajectory into the OPEN list.
 
@@ -166,6 +167,7 @@ inline double getMin2DDist(int x1, int y1, int x2, int y2) {
 }
 
 void aStar3D(Environment *env) {
+    RTRBENCH_LOOP("Time-space A-star loop");
     const int NUM_3D_DIRS = 9;
     // In 3D with time as the third dimension, there's one more action: in the
     // next step (dt=1), stay in the same place (dx=dy=0)

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "../tools/loop_timer.hpp"
 
 //Avoid optimizing compilers moving code around this barrier
 #define COMPILER_BARRIER() { __asm__ __volatile__("" ::: "memory");}
@@ -32,9 +33,11 @@ static inline void zsim_magic_op(uint64_t op) {
 static inline void zsim_roi_begin() {
     printf("[" HOOKS_STR "] ROI begin\n");
     zsim_magic_op(ZSIM_MAGIC_OP_ROI_BEGIN);
+    RTRBENCH_ROI_BEGIN();
 }
 
 static inline void zsim_roi_end() {
+    RTRBENCH_ROI_END();
     zsim_magic_op(ZSIM_MAGIC_OP_ROI_END);
     printf("[" HOOKS_STR  "] ROI end\n");
 }

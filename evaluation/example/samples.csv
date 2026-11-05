@@ -1,0 +1,321 @@
+kernel,mode,trial,region,file,line,calls,exclusive_ns,total_roi_ns
+01.pfl,baseline,0,Unattributed ROI,,0,0,14431434,14431434
+02.ekfslam,baseline,0,Unattributed ROI,,0,0,624984,624984
+04.pp2d,baseline,0,Unattributed ROI,,0,0,247098153,247098153
+05.pp3d,baseline,0,Unattributed ROI,,0,0,327710,327710
+06.movtar,baseline,0,Unattributed ROI,,0,0,1314381552,1314381552
+07.prm,baseline,0,Unattributed ROI,,0,0,3968443,3968443
+08.rrt,baseline,0,Unattributed ROI,,0,0,9149882,9149882
+09.rrtstar,baseline,0,Unattributed ROI,,0,0,27617863,27617863
+10.rrtpp,baseline,0,Unattributed ROI,,0,0,14901487,14901487
+11.sym-blkw,baseline,0,Unattributed ROI,,0,0,968208,968208
+12.sym-fext,baseline,0,Unattributed ROI,,0,0,244418856,244418856
+13.dmp,baseline,0,Unattributed ROI,,0,0,13761,13761
+14.mpc,baseline,0,Unattributed ROI,,0,0,17212523,17212523
+15.cem,baseline,0,Unattributed ROI,,0,0,40599,40599
+16.bo,baseline,0,Unattributed ROI,,0,0,35753,35753
+01.pfl,instrumented,0,Motion particle loop,pfilter.cpp,98,100,111134,15464188
+01.pfl,instrumented,0,Sensor particle and ray loops,pfilter.cpp,158,100,15280383,15464188
+01.pfl,instrumented,0,Particle resampling loops,pfilter.cpp,250,100,59282,15464188
+01.pfl,instrumented,0,Unattributed ROI,,0,0,13389,15464188
+02.ekfslam,instrumented,0,State prediction matrix loops,ekf.cpp,202,29,12867,537755
+02.ekfslam,instrumented,0,Landmark update matrix loops,ekf.cpp,287,29,519294,537755
+02.ekfslam,instrumented,0,Unattributed ROI,,0,0,5594,537755
+04.pp2d,instrumented,0,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,252217119,252218671
+04.pp2d,instrumented,0,Unattributed ROI,,0,0,1552,252218671
+05.pp3d,instrumented,0,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,325537,326639
+05.pp3d,instrumented,0,Unattributed ROI,,0,0,1102,326639
+06.movtar,instrumented,0,Backward Dijkstra loop,harness.cpp,64,1,11570635,1339391837
+06.movtar,instrumented,0,Time-space A-star loop,harness.cpp,170,1,1327816265,1339391837
+06.movtar,instrumented,0,Unattributed ROI,,0,0,4937,1339391837
+07.prm,instrumented,0,Roadmap connection loop,prm.cpp,64,1040,385180,4285099
+07.prm,instrumented,0,Configuration interpolation loop,planner.cpp,250,44931,3251277,4285099
+07.prm,instrumented,0,Roadmap search loop,prm.cpp,79,20,646759,4285099
+07.prm,instrumented,0,Unattributed ROI,,0,0,1883,4285099
+08.rrt,instrumented,0,RRT sampling and path loops,rrt.cpp,56,20,7316976,9271664
+08.rrt,instrumented,0,Configuration interpolation loop,planner.cpp,250,6009,1952906,9271664
+08.rrt,instrumented,0,Unattributed ROI,,0,0,1782,9271664
+09.rrtstar,instrumented,0,RRT-star sampling loop,rrt_star.cpp,55,20,8980488,28355652
+09.rrtstar,instrumented,0,Configuration interpolation loop,planner.cpp,250,25710,19373621,28355652
+09.rrtstar,instrumented,0,Unattributed ROI,,0,0,1543,28355652
+10.rrtpp,instrumented,0,RRT sampling and path loops,rrt.cpp,56,20,11954420,15282404
+10.rrtpp,instrumented,0,Configuration interpolation loop,planner.cpp,250,9845,3326854,15282404
+10.rrtpp,instrumented,0,Unattributed ROI,,0,0,1130,15282404
+11.sym-blkw,instrumented,0,Symbolic A-star action loop,harness.cpp,43,1,611715,1012965
+11.sym-blkw,instrumented,0,Action grounding loops,env.cpp,283,1,399888,1012965
+11.sym-blkw,instrumented,0,Unattributed ROI,,0,0,1362,1012965
+12.sym-fext,instrumented,0,Symbolic A-star action loop,harness.cpp,43,1,255946658,256887263
+12.sym-fext,instrumented,0,Action grounding loops,env.cpp,283,1,940015,256887263
+12.sym-fext,instrumented,0,Unattributed ROI,,0,0,590,256887263
+13.dmp,instrumented,0,DMP integration and basis loops,harness.cpp,128,1,11066,12119
+13.dmp,instrumented,0,Unattributed ROI,,0,0,1053,12119
+14.mpc,instrumented,0,MPC simulation loop,mpc.cpp,72,1,61819,17239943
+14.mpc,instrumented,0,MPC refinement loop,mpc.cpp,370,297,176648,17239943
+14.mpc,instrumented,0,QP assembly and solver loops,mpc.cpp,295,595,17000465,17239943
+14.mpc,instrumented,0,Unattributed ROI,,0,0,1011,17239943
+15.cem,instrumented,0,Policy sample and reward loop,harness.cpp,175,10,49230,53758
+15.cem,instrumented,0,Elite selection loop,harness.cpp,201,10,840,53758
+15.cem,instrumented,0,Policy distribution fit loop,harness.cpp,214,10,581,53758
+15.cem,instrumented,0,Unattributed ROI,,0,0,3107,53758
+16.bo,instrumented,0,Gaussian process training loops,gauss_proc.cpp,57,2,2173,48602
+16.bo,instrumented,0,Policy sample and reward loop,harness.cpp,196,10,31269,48602
+16.bo,instrumented,0,Gaussian process prediction loops,gauss_proc.cpp,114,100,10280,48602
+16.bo,instrumented,0,Elite selection loop,harness.cpp,216,10,800,48602
+16.bo,instrumented,0,Policy distribution fit loop,harness.cpp,229,10,412,48602
+16.bo,instrumented,0,Unattributed ROI,,0,0,3668,48602
+01.pfl,instrumented,1,Motion particle loop,pfilter.cpp,98,100,108202,15429867
+01.pfl,instrumented,1,Sensor particle and ray loops,pfilter.cpp,158,100,15256896,15429867
+01.pfl,instrumented,1,Particle resampling loops,pfilter.cpp,250,100,51266,15429867
+01.pfl,instrumented,1,Unattributed ROI,,0,0,13503,15429867
+02.ekfslam,instrumented,1,State prediction matrix loops,ekf.cpp,202,29,16729,519397
+02.ekfslam,instrumented,1,Landmark update matrix loops,ekf.cpp,287,29,497710,519397
+02.ekfslam,instrumented,1,Unattributed ROI,,0,0,4958,519397
+04.pp2d,instrumented,1,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,256268158,256269770
+04.pp2d,instrumented,1,Unattributed ROI,,0,0,1612,256269770
+05.pp3d,instrumented,1,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,331196,332287
+05.pp3d,instrumented,1,Unattributed ROI,,0,0,1091,332287
+06.movtar,instrumented,1,Backward Dijkstra loop,harness.cpp,64,1,10842255,1316175646
+06.movtar,instrumented,1,Time-space A-star loop,harness.cpp,170,1,1305328403,1316175646
+06.movtar,instrumented,1,Unattributed ROI,,0,0,4988,1316175646
+07.prm,instrumented,1,Roadmap connection loop,prm.cpp,64,1040,342192,3679240
+07.prm,instrumented,1,Configuration interpolation loop,planner.cpp,250,44931,2974599,3679240
+07.prm,instrumented,1,Roadmap search loop,prm.cpp,79,20,361217,3679240
+07.prm,instrumented,1,Unattributed ROI,,0,0,1232,3679240
+08.rrt,instrumented,1,RRT sampling and path loops,rrt.cpp,56,20,6748955,8549648
+08.rrt,instrumented,1,Configuration interpolation loop,planner.cpp,250,6009,1799071,8549648
+08.rrt,instrumented,1,Unattributed ROI,,0,0,1622,8549648
+09.rrtstar,instrumented,1,RRT-star sampling loop,rrt_star.cpp,55,20,8199103,25807638
+09.rrtstar,instrumented,1,Configuration interpolation loop,planner.cpp,250,25710,17607264,25807638
+09.rrtstar,instrumented,1,Unattributed ROI,,0,0,1271,25807638
+10.rrtpp,instrumented,1,RRT sampling and path loops,rrt.cpp,56,20,10947984,14012085
+10.rrtpp,instrumented,1,Configuration interpolation loop,planner.cpp,250,9845,3063140,14012085
+10.rrtpp,instrumented,1,Unattributed ROI,,0,0,961,14012085
+11.sym-blkw,instrumented,1,Symbolic A-star action loop,harness.cpp,43,1,557935,903842
+11.sym-blkw,instrumented,1,Action grounding loops,env.cpp,283,1,344785,903842
+11.sym-blkw,instrumented,1,Unattributed ROI,,0,0,1122,903842
+12.sym-fext,instrumented,1,Symbolic A-star action loop,harness.cpp,43,1,252245150,253197214
+12.sym-fext,instrumented,1,Action grounding loops,env.cpp,283,1,950752,253197214
+12.sym-fext,instrumented,1,Unattributed ROI,,0,0,1312,253197214
+13.dmp,instrumented,1,DMP integration and basis loops,harness.cpp,128,1,13380,14242
+13.dmp,instrumented,1,Unattributed ROI,,0,0,862,14242
+14.mpc,instrumented,1,MPC simulation loop,mpc.cpp,72,1,59360,15899929
+14.mpc,instrumented,1,MPC refinement loop,mpc.cpp,370,297,165602,15899929
+14.mpc,instrumented,1,QP assembly and solver loops,mpc.cpp,295,595,15673996,15899929
+14.mpc,instrumented,1,Unattributed ROI,,0,0,971,15899929
+15.cem,instrumented,1,Policy sample and reward loop,harness.cpp,175,10,34702,39449
+15.cem,instrumented,1,Elite selection loop,harness.cpp,201,10,821,39449
+15.cem,instrumented,1,Policy distribution fit loop,harness.cpp,214,10,580,39449
+15.cem,instrumented,1,Unattributed ROI,,0,0,3346,39449
+16.bo,instrumented,1,Gaussian process training loops,gauss_proc.cpp,57,2,2073,39018
+16.bo,instrumented,1,Policy sample and reward loop,harness.cpp,196,10,22632,39018
+16.bo,instrumented,1,Gaussian process prediction loops,gauss_proc.cpp,114,100,9879,39018
+16.bo,instrumented,1,Elite selection loop,harness.cpp,216,10,732,39018
+16.bo,instrumented,1,Policy distribution fit loop,harness.cpp,229,10,390,39018
+16.bo,instrumented,1,Unattributed ROI,,0,0,3312,39018
+01.pfl,baseline,1,Unattributed ROI,,0,0,15556335,15556335
+02.ekfslam,baseline,1,Unattributed ROI,,0,0,614990,614990
+04.pp2d,baseline,1,Unattributed ROI,,0,0,251534429,251534429
+05.pp3d,baseline,1,Unattributed ROI,,0,0,324285,324285
+06.movtar,baseline,1,Unattributed ROI,,0,0,1319690753,1319690753
+07.prm,baseline,1,Unattributed ROI,,0,0,3959881,3959881
+08.rrt,baseline,1,Unattributed ROI,,0,0,8993390,8993390
+09.rrtstar,baseline,1,Unattributed ROI,,0,0,27537164,27537164
+10.rrtpp,baseline,1,Unattributed ROI,,0,0,15225995,15225995
+11.sym-blkw,baseline,1,Unattributed ROI,,0,0,972214,972214
+12.sym-fext,baseline,1,Unattributed ROI,,0,0,231078324,231078324
+13.dmp,baseline,1,Unattributed ROI,,0,0,24347,24347
+14.mpc,baseline,1,Unattributed ROI,,0,0,15983625,15983625
+15.cem,baseline,1,Unattributed ROI,,0,0,49074,49074
+16.bo,baseline,1,Unattributed ROI,,0,0,45388,45388
+01.pfl,baseline,2,Unattributed ROI,,0,0,14323021,14323021
+02.ekfslam,baseline,2,Unattributed ROI,,0,0,626557,626557
+04.pp2d,baseline,2,Unattributed ROI,,0,0,248437456,248437456
+05.pp3d,baseline,2,Unattributed ROI,,0,0,338757,338757
+06.movtar,baseline,2,Unattributed ROI,,0,0,1297406886,1297406886
+07.prm,baseline,2,Unattributed ROI,,0,0,4015175,4015175
+08.rrt,baseline,2,Unattributed ROI,,0,0,9077429,9077429
+09.rrtstar,baseline,2,Unattributed ROI,,0,0,27721140,27721140
+10.rrtpp,baseline,2,Unattributed ROI,,0,0,15186604,15186604
+11.sym-blkw,baseline,2,Unattributed ROI,,0,0,984392,984392
+12.sym-fext,baseline,2,Unattributed ROI,,0,0,248999426,248999426
+13.dmp,baseline,2,Unattributed ROI,,0,0,19980,19980
+14.mpc,baseline,2,Unattributed ROI,,0,0,17213113,17213113
+15.cem,baseline,2,Unattributed ROI,,0,0,40904,40904
+16.bo,baseline,2,Unattributed ROI,,0,0,45859,45859
+01.pfl,instrumented,2,Motion particle loop,pfilter.cpp,98,100,108163,15445460
+01.pfl,instrumented,2,Sensor particle and ray loops,pfilter.cpp,158,100,15271866,15445460
+01.pfl,instrumented,2,Particle resampling loops,pfilter.cpp,250,100,51445,15445460
+01.pfl,instrumented,2,Unattributed ROI,,0,0,13986,15445460
+02.ekfslam,instrumented,2,State prediction matrix loops,ekf.cpp,202,29,14854,551304
+02.ekfslam,instrumented,2,Landmark update matrix loops,ekf.cpp,287,29,530642,551304
+02.ekfslam,instrumented,2,Unattributed ROI,,0,0,5808,551304
+04.pp2d,instrumented,2,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,249361579,249363160
+04.pp2d,instrumented,2,Unattributed ROI,,0,0,1581,249363160
+05.pp3d,instrumented,2,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,324656,325788
+05.pp3d,instrumented,2,Unattributed ROI,,0,0,1132,325788
+06.movtar,instrumented,2,Backward Dijkstra loop,harness.cpp,64,1,11501191,1341948441
+06.movtar,instrumented,2,Time-space A-star loop,harness.cpp,170,1,1330441942,1341948441
+06.movtar,instrumented,2,Unattributed ROI,,0,0,5308,1341948441
+07.prm,instrumented,2,Roadmap connection loop,prm.cpp,64,1040,349935,3702009
+07.prm,instrumented,2,Configuration interpolation loop,planner.cpp,250,44931,2990842,3702009
+07.prm,instrumented,2,Roadmap search loop,prm.cpp,79,20,359951,3702009
+07.prm,instrumented,2,Unattributed ROI,,0,0,1281,3702009
+08.rrt,instrumented,2,RRT sampling and path loops,rrt.cpp,56,20,7349058,9315179
+08.rrt,instrumented,2,Configuration interpolation loop,planner.cpp,250,6009,1964287,9315179
+08.rrt,instrumented,2,Unattributed ROI,,0,0,1834,9315179
+09.rrtstar,instrumented,2,RRT-star sampling loop,rrt_star.cpp,55,20,9030191,28320965
+09.rrtstar,instrumented,2,Configuration interpolation loop,planner.cpp,250,25710,19289170,28320965
+09.rrtstar,instrumented,2,Unattributed ROI,,0,0,1604,28320965
+10.rrtpp,instrumented,2,RRT sampling and path loops,rrt.cpp,56,20,12109145,15493753
+10.rrtpp,instrumented,2,Configuration interpolation loop,planner.cpp,250,9845,3383476,15493753
+10.rrtpp,instrumented,2,Unattributed ROI,,0,0,1132,15493753
+11.sym-blkw,instrumented,2,Symbolic A-star action loop,harness.cpp,43,1,608200,1008478
+11.sym-blkw,instrumented,2,Action grounding loops,env.cpp,283,1,398866,1008478
+11.sym-blkw,instrumented,2,Unattributed ROI,,0,0,1412,1008478
+12.sym-fext,instrumented,2,Symbolic A-star action loop,harness.cpp,43,1,255236003,256212404
+12.sym-fext,instrumented,2,Action grounding loops,env.cpp,283,1,975720,256212404
+12.sym-fext,instrumented,2,Unattributed ROI,,0,0,681,256212404
+13.dmp,instrumented,2,DMP integration and basis loops,harness.cpp,128,1,21902,22914
+13.dmp,instrumented,2,Unattributed ROI,,0,0,1012,22914
+14.mpc,instrumented,2,MPC simulation loop,mpc.cpp,72,1,63916,17152252
+14.mpc,instrumented,2,MPC refinement loop,mpc.cpp,370,297,179391,17152252
+14.mpc,instrumented,2,QP assembly and solver loops,mpc.cpp,295,595,16907834,17152252
+14.mpc,instrumented,2,Unattributed ROI,,0,0,1111,17152252
+15.cem,instrumented,2,Policy sample and reward loop,harness.cpp,175,10,42371,47429
+15.cem,instrumented,2,Elite selection loop,harness.cpp,201,10,942,47429
+15.cem,instrumented,2,Policy distribution fit loop,harness.cpp,214,10,500,47429
+15.cem,instrumented,2,Unattributed ROI,,0,0,3616,47429
+16.bo,instrumented,2,Gaussian process training loops,gauss_proc.cpp,57,2,2153,51677
+16.bo,instrumented,2,Policy sample and reward loop,harness.cpp,196,10,33171,51677
+16.bo,instrumented,2,Gaussian process prediction loops,gauss_proc.cpp,114,100,11767,51677
+16.bo,instrumented,2,Elite selection loop,harness.cpp,216,10,800,51677
+16.bo,instrumented,2,Policy distribution fit loop,harness.cpp,229,10,450,51677
+16.bo,instrumented,2,Unattributed ROI,,0,0,3336,51677
+01.pfl,instrumented,3,Motion particle loop,pfilter.cpp,98,100,108399,15462375
+01.pfl,instrumented,3,Sensor particle and ray loops,pfilter.cpp,158,100,15288768,15462375
+01.pfl,instrumented,3,Particle resampling loops,pfilter.cpp,250,100,51647,15462375
+01.pfl,instrumented,3,Unattributed ROI,,0,0,13561,15462375
+02.ekfslam,instrumented,3,State prediction matrix loops,ekf.cpp,202,29,13399,537113
+02.ekfslam,instrumented,3,Landmark update matrix loops,ekf.cpp,287,29,518436,537113
+02.ekfslam,instrumented,3,Unattributed ROI,,0,0,5278,537113
+04.pp2d,instrumented,3,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,253133039,253134522
+04.pp2d,instrumented,3,Unattributed ROI,,0,0,1483,253134522
+05.pp3d,instrumented,3,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,305367,306328
+05.pp3d,instrumented,3,Unattributed ROI,,0,0,961,306328
+06.movtar,instrumented,3,Backward Dijkstra loop,harness.cpp,64,1,11519398,1359164718
+06.movtar,instrumented,3,Time-space A-star loop,harness.cpp,170,1,1347640043,1359164718
+06.movtar,instrumented,3,Unattributed ROI,,0,0,5277,1359164718
+07.prm,instrumented,3,Roadmap connection loop,prm.cpp,64,1040,372100,4008003
+07.prm,instrumented,3,Configuration interpolation loop,planner.cpp,250,44931,3245120,4008003
+07.prm,instrumented,3,Roadmap search loop,prm.cpp,79,20,389511,4008003
+07.prm,instrumented,3,Unattributed ROI,,0,0,1272,4008003
+08.rrt,instrumented,3,RRT sampling and path loops,rrt.cpp,56,20,7454224,9444757
+08.rrt,instrumented,3,Configuration interpolation loop,planner.cpp,250,6009,1988612,9444757
+08.rrt,instrumented,3,Unattributed ROI,,0,0,1921,9444757
+09.rrtstar,instrumented,3,RRT-star sampling loop,rrt_star.cpp,55,20,9029613,28405171
+09.rrtstar,instrumented,3,Configuration interpolation loop,planner.cpp,250,25710,19373896,28405171
+09.rrtstar,instrumented,3,Unattributed ROI,,0,0,1662,28405171
+10.rrtpp,instrumented,3,RRT sampling and path loops,rrt.cpp,56,20,11870239,15204621
+10.rrtpp,instrumented,3,Configuration interpolation loop,planner.cpp,250,9845,3333380,15204621
+10.rrtpp,instrumented,3,Unattributed ROI,,0,0,1002,15204621
+11.sym-blkw,instrumented,3,Symbolic A-star action loop,harness.cpp,43,1,608220,995620
+11.sym-blkw,instrumented,3,Action grounding loops,env.cpp,283,1,386278,995620
+11.sym-blkw,instrumented,3,Unattributed ROI,,0,0,1122,995620
+12.sym-fext,instrumented,3,Symbolic A-star action loop,harness.cpp,43,1,249745864,250703015
+12.sym-fext,instrumented,3,Action grounding loops,env.cpp,283,1,956590,250703015
+12.sym-fext,instrumented,3,Unattributed ROI,,0,0,561,250703015
+13.dmp,instrumented,3,DMP integration and basis loops,harness.cpp,128,1,18858,19679
+13.dmp,instrumented,3,Unattributed ROI,,0,0,821,19679
+14.mpc,instrumented,3,MPC simulation loop,mpc.cpp,72,1,58931,15916364
+14.mpc,instrumented,3,MPC refinement loop,mpc.cpp,370,297,166814,15916364
+14.mpc,instrumented,3,QP assembly and solver loops,mpc.cpp,295,595,15689618,15916364
+14.mpc,instrumented,3,Unattributed ROI,,0,0,1001,15916364
+15.cem,instrumented,3,Policy sample and reward loop,harness.cpp,175,10,43716,48813
+15.cem,instrumented,3,Elite selection loop,harness.cpp,201,10,891,48813
+15.cem,instrumented,3,Policy distribution fit loop,harness.cpp,214,10,591,48813
+15.cem,instrumented,3,Unattributed ROI,,0,0,3615,48813
+16.bo,instrumented,3,Gaussian process training loops,gauss_proc.cpp,57,2,2163,49124
+16.bo,instrumented,3,Policy sample and reward loop,harness.cpp,196,10,31730,49124
+16.bo,instrumented,3,Gaussian process prediction loops,gauss_proc.cpp,114,100,10542,49124
+16.bo,instrumented,3,Elite selection loop,harness.cpp,216,10,781,49124
+16.bo,instrumented,3,Policy distribution fit loop,harness.cpp,229,10,481,49124
+16.bo,instrumented,3,Unattributed ROI,,0,0,3427,49124
+01.pfl,baseline,3,Unattributed ROI,,0,0,15683997,15683997
+02.ekfslam,baseline,3,Unattributed ROI,,0,0,623122,623122
+04.pp2d,baseline,3,Unattributed ROI,,0,0,249370401,249370401
+05.pp3d,baseline,3,Unattributed ROI,,0,0,340168,340168
+06.movtar,baseline,3,Unattributed ROI,,0,0,1311044792,1311044792
+07.prm,baseline,3,Unattributed ROI,,0,0,3990007,3990007
+08.rrt,baseline,3,Unattributed ROI,,0,0,9053599,9053599
+09.rrtstar,baseline,3,Unattributed ROI,,0,0,27550264,27550264
+10.rrtpp,baseline,3,Unattributed ROI,,0,0,14939586,14939586
+11.sym-blkw,baseline,3,Unattributed ROI,,0,0,993396,993396
+12.sym-fext,baseline,3,Unattributed ROI,,0,0,243866610,243866610
+13.dmp,baseline,3,Unattributed ROI,,0,0,22614,22614
+14.mpc,baseline,3,Unattributed ROI,,0,0,15833611,15833611
+15.cem,baseline,3,Unattributed ROI,,0,0,50234,50234
+16.bo,baseline,3,Unattributed ROI,,0,0,36865,36865
+01.pfl,baseline,4,Unattributed ROI,,0,0,15488935,15488935
+02.ekfslam,baseline,4,Unattributed ROI,,0,0,568760,568760
+04.pp2d,baseline,4,Unattributed ROI,,0,0,232471328,232471328
+05.pp3d,baseline,4,Unattributed ROI,,0,0,311345,311345
+06.movtar,baseline,4,Unattributed ROI,,0,0,1236995697,1236995697
+07.prm,baseline,4,Unattributed ROI,,0,0,3927878,3927878
+08.rrt,baseline,4,Unattributed ROI,,0,0,8396296,8396296
+09.rrtstar,baseline,4,Unattributed ROI,,0,0,25691765,25691765
+10.rrtpp,baseline,4,Unattributed ROI,,0,0,13847098,13847098
+11.sym-blkw,baseline,4,Unattributed ROI,,0,0,904753,904753
+12.sym-fext,baseline,4,Unattributed ROI,,0,0,242159897,242159897
+13.dmp,baseline,4,Unattributed ROI,,0,0,12038,12038
+14.mpc,baseline,4,Unattributed ROI,,0,0,15965869,15965869
+15.cem,baseline,4,Unattributed ROI,,0,0,37760,37760
+16.bo,baseline,4,Unattributed ROI,,0,0,44656,44656
+01.pfl,instrumented,4,Motion particle loop,pfilter.cpp,98,100,103732,15643986
+01.pfl,instrumented,4,Sensor particle and ray loops,pfilter.cpp,158,100,15476067,15643986
+01.pfl,instrumented,4,Particle resampling loops,pfilter.cpp,250,100,50961,15643986
+01.pfl,instrumented,4,Unattributed ROI,,0,0,13226,15643986
+02.ekfslam,instrumented,4,State prediction matrix loops,ekf.cpp,202,29,12580,497404
+02.ekfslam,instrumented,4,Landmark update matrix loops,ekf.cpp,287,29,479846,497404
+02.ekfslam,instrumented,4,Unattributed ROI,,0,0,4978,497404
+04.pp2d,instrumented,4,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,231559304,231560816
+04.pp2d,instrumented,4,Unattributed ROI,,0,0,1512,231560816
+05.pp3d,instrumented,4,A-star expansion loop,../astar-bare/astar_bare.cpp,53,1,302543,303504
+05.pp3d,instrumented,4,Unattributed ROI,,0,0,961,303504
+06.movtar,instrumented,4,Backward Dijkstra loop,harness.cpp,64,1,11191287,1280438176
+06.movtar,instrumented,4,Time-space A-star loop,harness.cpp,170,1,1269240861,1280438176
+06.movtar,instrumented,4,Unattributed ROI,,0,0,6028,1280438176
+07.prm,instrumented,4,Roadmap connection loop,prm.cpp,64,1040,357026,3992502
+07.prm,instrumented,4,Configuration interpolation loop,planner.cpp,250,44931,2992394,3992502
+07.prm,instrumented,4,Roadmap search loop,prm.cpp,79,20,641298,3992502
+07.prm,instrumented,4,Unattributed ROI,,0,0,1784,3992502
+08.rrt,instrumented,4,RRT sampling and path loops,rrt.cpp,56,20,6730216,8562929
+08.rrt,instrumented,4,Configuration interpolation loop,planner.cpp,250,6009,1831032,8562929
+08.rrt,instrumented,4,Unattributed ROI,,0,0,1681,8562929
+09.rrtstar,instrumented,4,RRT-star sampling loop,rrt_star.cpp,55,20,8273787,26104340
+09.rrtstar,instrumented,4,Configuration interpolation loop,planner.cpp,250,25710,17829192,26104340
+09.rrtstar,instrumented,4,Unattributed ROI,,0,0,1361,26104340
+10.rrtpp,instrumented,4,RRT sampling and path loops,rrt.cpp,56,20,11068639,14141271
+10.rrtpp,instrumented,4,Configuration interpolation loop,planner.cpp,250,9845,3071320,14141271
+10.rrtpp,instrumented,4,Unattributed ROI,,0,0,1312,14141271
+11.sym-blkw,instrumented,4,Symbolic A-star action loop,harness.cpp,43,1,563301,942529
+11.sym-blkw,instrumented,4,Action grounding loops,env.cpp,283,1,378016,942529
+11.sym-blkw,instrumented,4,Unattributed ROI,,0,0,1212,942529
+12.sym-fext,instrumented,4,Symbolic A-star action loop,harness.cpp,43,1,244278686,245183078
+12.sym-fext,instrumented,4,Action grounding loops,env.cpp,283,1,903702,245183078
+12.sym-fext,instrumented,4,Unattributed ROI,,0,0,690,245183078
+13.dmp,instrumented,4,DMP integration and basis loops,harness.cpp,128,1,19149,20040
+13.dmp,instrumented,4,Unattributed ROI,,0,0,891,20040
+14.mpc,instrumented,4,MPC simulation loop,mpc.cpp,72,1,65990,17174275
+14.mpc,instrumented,4,MPC refinement loop,mpc.cpp,370,297,175692,17174275
+14.mpc,instrumented,4,QP assembly and solver loops,mpc.cpp,295,595,16931542,17174275
+14.mpc,instrumented,4,Unattributed ROI,,0,0,1051,17174275
+15.cem,instrumented,4,Policy sample and reward loop,harness.cpp,175,10,45473,50520
+15.cem,instrumented,4,Elite selection loop,harness.cpp,201,10,892,50520
+15.cem,instrumented,4,Policy distribution fit loop,harness.cpp,214,10,610,50520
+15.cem,instrumented,4,Unattributed ROI,,0,0,3545,50520
+16.bo,instrumented,4,Gaussian process training loops,gauss_proc.cpp,57,2,2053,48293
+16.bo,instrumented,4,Policy sample and reward loop,harness.cpp,196,10,30860,48293
+16.bo,instrumented,4,Gaussian process prediction loops,gauss_proc.cpp,114,100,10894,48293
+16.bo,instrumented,4,Elite selection loop,harness.cpp,216,10,721,48293
+16.bo,instrumented,4,Policy distribution fit loop,harness.cpp,229,10,390,48293
+16.bo,instrumented,4,Unattributed ROI,,0,0,3375,48293
