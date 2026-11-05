@@ -49,6 +49,63 @@ Use `build.sh` and `clean.sh` scripts to build and clean *all* of the kernels.
 
 ## Run
 
+### Run all 16 kernels
+
+The root runner executes one representative workload per kernel, sequentially:
+
+```bash
+./run.sh --build --scene-dir /path/to/preprocessed/living-room
+```
+
+It works from any working directory. `--build` builds each shared kernel
+directory once with two make jobs; omit it to use existing binaries. Bash 4+
+and the build requirements above are needed. GCC 8 additionally needs its
+filesystem compatibility library when linking scene reconstruction; use
+`MAKEFLAGS='LDFLAGS=-lstdc++fs' ./run.sh --build --scene-dir /path/to/scene`
+with that compiler. Make command-line overrides can also be passed through
+`MAKEFLAGS`.
+
+Scene reconstruction is the only kernel whose dataset is not included. Follow
+[its input documentation](perception/03.srec/README.md), then supply the scene
+directory with `--scene-dir`. It must contain `init_transform.txt`, `depth/N.png`,
+`rgb/N.png`, and `normal/N-dim1.txt` through `N-dim3.txt` for frames 1 through 10.
+Use `--camera FILE` for another camera calibration and `--scene-frames N` to
+change the frame range. Missing inputs are reported as failures; the remaining
+kernels still run and the overall exit status is nonzero.
+If the scene is not available, explicitly run the other 15 kernels with
+`./run.sh --build --skip 03.srec`. Its summary row is `SKIP`, not `PASS`.
+
+Useful options:
+
+```bash
+./run.sh --list
+./run.sh --dry-run                          # Preview all 16 commands; no writes
+./run.sh --kernel 07.prm --kernel 08.rrt    # Run selected kernels
+./run.sh --skip 03.srec                    # Explicitly omit scene reconstruction
+./run.sh --output-dir /path/to/new-results --scene-dir /path/to/scene
+./run.sh --help
+```
+
+The output directory must be new. By default it is
+`results/<timestamp>-<pid>/`. Each kernel gets `command.txt`, `console.log`,
+and `result.txt`; build logs and `summary.tsv` are at the output root.
+The summary records each process exit code (`-` for an explicit skip). The
+runner exits 0 when all non-skipped selected kernels succeed, 1 for any
+build/input/process failure, and 2 for an invalid invocation. Inputs are linked
+into each result directory under short
+relative names because the kernels' argument parser does not support spaces
+inside path values. The original input files are not copied or edited.
+
+The representative profile uses the included map/log/problem/trajectory
+examples, all four robot-arm planners, and both symbolic planning problems.
+It uses 100 particles and 100 updates for PFL, downsampling 10 for scene
+reconstruction, 1,000 samples for robot-arm planning (`--arm-samples N` to
+change it), 100 seconds of simulated MPC time, and 10 updates/10 samples for
+CEM and BO. These are individual kernel runs; use the existing per-kernel
+`run_all.sh` scripts below for parameter sweeps.
+
+### Run an individual kernel
+
 To run every kernel, simply issue the following command:
 ```
 $ ./BINARY_NAME ARGS [ARGS]

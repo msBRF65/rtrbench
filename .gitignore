@@ -3,3 +3,4 @@
 **/*.gold
 verify_all.sh
 build.log
+/results/
