@@ -53,9 +53,12 @@ static std::vector<double> sample(const PARAM &mu, const PARAM &cov) {
     assert(mu.size() == cov.size());
 
     std::vector<double> r;
-    for (int i = 0; i < static_cast<int>(mu.size()); i++) {
-        std::normal_distribution<double> distribution(mu[i], cov[i]);
-        r.push_back(distribution(generator));
+    {
+        RTRBENCH_LOOP("CEM parameter sampling");
+        for (int i = 0; i < static_cast<int>(mu.size()); i++) {
+            std::normal_distribution<double> distribution(mu[i], cov[i]);
+            r.push_back(distribution(generator));
+        }
     }
 
     return r;
@@ -171,25 +174,22 @@ int main(int argc, const char **argv) {
 
         policiesLog.push_back(policyMu);
 
-        {
-            RTRBENCH_LOOP("Policy sample and reward loop");
-            for (int s = 0; s < numSamples; s++) {
-                auto sampledParams = sample(policyMu, policyCov);
+        for (int s = 0; s < numSamples; s++) {
+            auto sampledParams = sample(policyMu, policyCov);
 
-                // Exclude from ROI: the following function
-                // *fakes* the actual rollout.  This is
-                // supposed to happen in the real world, and
-                // its latency heavily depends on the
-                // mechanics, not computation.
-                zsim_roi_end();
-                auto projectedPos = getPosition(sampledParams);
-                zsim_roi_begin();
+            // Exclude from ROI: the following function
+            // *fakes* the actual rollout.  This is
+            // supposed to happen in the real world, and
+            // its latency heavily depends on the
+            // mechanics, not computation.
+            zsim_roi_end();
+            auto projectedPos = getPosition(sampledParams);
+            zsim_roi_begin();
 
-                auto reward = getReward(projectedPos);
+            auto reward = getReward(projectedPos);
 
-                skillParams.push_back(sampledParams);
-                rewards.push_back(reward);
-            }
+            skillParams.push_back(sampledParams);
+            rewards.push_back(reward);
         }
 
         std::vector<double> sortedRewards(rewards);
@@ -198,7 +198,7 @@ int main(int argc, const char **argv) {
         double rewardThreshold = sortedRewards[numSamples - topN];
         std::vector<int> chosenIndices;
         {
-            RTRBENCH_LOOP("Elite selection loop");
+            RTRBENCH_LOOP("CEM elite selection");
             for (int i = 0; i < numSamples; i++) {
                 if (rewards[i] >= rewardThreshold) {
                     chosenIndices.push_back(i);
@@ -211,7 +211,7 @@ int main(int argc, const char **argv) {
 
         // Update policy
         {
-            RTRBENCH_LOOP("Policy distribution fit loop");
+            RTRBENCH_LOOP("CEM policy fitting");
             for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {
                 // Update mean
                 double sum = policyMu[i];

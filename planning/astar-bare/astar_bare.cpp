@@ -50,7 +50,6 @@ AStar::AStar(STATE initial, STATE goal, double hWeight) {
 }
 
 PATH AStar::run(uint64_t maxExpansions) {
-    RTRBENCH_LOOP("A-star expansion loop");
     MIN_HEAP openList;
     BaseEPS<STATE> *visited = nullptr;
     if (this->initState.size() <= 3) {
@@ -98,22 +97,25 @@ PATH AStar::run(uint64_t maxExpansions) {
         // The data structures are race-free.
 
         // #pragma omp parallel for ordered
-        for (int dir = 0; dir < static_cast<int>(neighbors.size()); dir++) {
-            STATE neighborState = neighbors[dir];
-            assert(neighborState.size() == this->initState.size());
-            if (visited->contains(neighborState)) continue;
+        {
+            RTRBENCH_LOOP("A-star neighbor scoring");
+            for (int dir = 0; dir < static_cast<int>(neighbors.size()); dir++) {
+                STATE neighborState = neighbors[dir];
+                assert(neighborState.size() == this->initState.size());
+                if (visited->contains(neighborState)) continue;
 
-            if (this->isValid(neighborState)) {
-                double g = this->getG(expNode->s, neighborState, \
-                        expNode->g, dir);
-                double f = g + this->heuristicWeight * \
-                           this->getH(neighborState);
+                if (this->isValid(neighborState)) {
+                    double g = this->getG(expNode->s, neighborState, \
+                            expNode->g, dir);
+                    double f = g + this->heuristicWeight * \
+                               this->getH(neighborState);
 
-                // #pragma omp ordered
-                if (!gVals->contains(neighborState) || \
-                        g < gVals->getValue(neighborState)) {
-                    gVals->insert(neighborState, g);
-                    openList.push(new Node(neighborState, g, f, expNode, dir));
+                    // #pragma omp ordered
+                    if (!gVals->contains(neighborState) || \
+                            g < gVals->getValue(neighborState)) {
+                        gVals->insert(neighborState, g);
+                        openList.push(new Node(neighborState, g, f, expNode, dir));
+                    }
                 }
             }
         }

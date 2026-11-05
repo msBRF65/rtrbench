@@ -12,6 +12,7 @@ import textwrap
 def aggregate(samples):
     groups = collections.defaultdict(list)
     totals = {}
+    inclusive_groups = collections.defaultdict(list)
     partitions = collections.defaultdict(int)
     seen = set()
     for row in samples:
@@ -28,6 +29,12 @@ def aggregate(samples):
         if elapsed < 0 or total <= 0:
             raise ValueError('Timing must be nonnegative with a positive ROI total')
         groups[key].append(elapsed / 1e6)
+        inclusive = row.get('inclusive_ns')
+        if inclusive not in (None, '') and row['region'] != 'Unattributed ROI':
+            inclusive = int(inclusive)
+            if inclusive < elapsed:
+                raise ValueError('Inclusive elapsed is smaller than exclusive time')
+            inclusive_groups[key].append(inclusive/1e6)
         if trial in totals and totals[trial] != total:
             raise ValueError('Inconsistent total per trial')
         totals[trial] = total
@@ -37,7 +44,12 @@ def aggregate(samples):
     summary = []
     for (kernel, mode, region), values in sorted(groups.items()):
         summary.append(dict(kernel=kernel, mode=mode, region=region, n=len(values),
-                            mean_ms=statistics.mean(values), population_std_ms=statistics.pstdev(values)))
+                            mean_ms=statistics.mean(values), population_std_ms=statistics.pstdev(values),
+                            inclusive_n=len(inclusive_groups[kernel, mode, region]),
+                            inclusive_mean_ms=(statistics.mean(inclusive_groups[kernel, mode, region])
+                                               if inclusive_groups[kernel, mode, region] else None),
+                            inclusive_population_std_ms=(statistics.pstdev(inclusive_groups[kernel, mode, region])
+                                                         if inclusive_groups[kernel, mode, region] else None)))
     roi = []
     for kernel in sorted({key[0] for key in totals}):
         modes = {mode: [value/1e6 for (name, m, _), value in totals.items()
@@ -99,10 +111,22 @@ def plot(summary, roi, output):
         other = next(row for row in rows if row['kernel'] == kernel
                      and row['region'] == 'Unattributed ROI')
         parts.append(other)
-        labels = [textwrap.fill('Other' if row['region'] == 'Unattributed ROI'
-                                else row['region'], 22) for row in parts]
-        means = [row['mean_ms'] for row in parts]
-        errors = [row['population_std_ms'] for row in parts]
+        inclusive_available = any(row['inclusive_n'] for row in parts)
+        def label(row):
+            if row['region'] == 'Unattributed ROI':
+                return 'Other (exclusive)'
+            suffix = (' (exclusive only)' if inclusive_available and row['inclusive_mean_ms'] is None else '')
+            count = row['inclusive_n'] if row['inclusive_mean_ms'] is not None else row['n']
+            return textwrap.fill(row['region'] + suffix, 22) + '\nn=' + str(count)
+        labels = [label(row) for row in parts]
+        def elapsed(row):
+            return row['inclusive_mean_ms'] if row['inclusive_mean_ms'] is not None else row['mean_ms']
+        def deviation(row):
+            return (row['inclusive_population_std_ms'] if row['inclusive_mean_ms'] is not None
+                    else row['population_std_ms'])
+        means = [elapsed(row) for row in parts]
+        errors = [deviation(row) for row in parts]
+        inclusive_available = any(row['inclusive_n'] for row in parts)
         fig, ax = plt.subplots(figsize=(max(8, len(parts)*2.2), 6))
         positions = list(range(len(parts)))
         ax.bar(positions, means, yerr=errors, capsize=4,
@@ -112,9 +136,12 @@ def plot(summary, roi, output):
                         textcoords='offset points', ha='center', fontsize=9)
         ax.set_xticks(positions, labels)
         ax.set_ylim(0, max(max(mean+std for mean, std in zip(means, errors))*1.2, 1e-6))
-        ax.set_ylabel('Exclusive compute ROI wall time (ms; mean ± population std)')
-        ax.set_xlabel('Measured processing region; Other = ROI outside named regions')
-        ax.set_title(kernel + ': time by processing region')
+        ax.set_ylabel(('Inclusive loop elapsed' if inclusive_available else 'Exclusive time; inclusive unavailable') +
+                      ' (ms; mean ± population std)')
+        ax.set_xlabel('Loop intervals overlap; Other = exclusive ROI outside all named loops' if inclusive_available
+                      else 'Legacy exclusive regions; no inclusive elapsed recorded')
+        ax.set_title(kernel + ': loop elapsed including nested calls' if inclusive_available
+                     else kernel + ': legacy exclusive processing times')
         ax.grid(axis='y', alpha=.2)
         fig.tight_layout()
         fig.savefig(output / (kernel + '.png'), dpi=180)
@@ -128,7 +155,7 @@ def evaluate(samples, output, tables_only=False):
     write_csv(output / 'roi-and-overhead.csv', roi)
     lines = ['# Loop timing results', '',
              'Times are main-thread wall time inside existing compute ROIs; paused rollouts, input loading and builds are excluded.',
-             'Parts are exclusive: inner regions replace parent time; unattributed ROI is retained. Means and population standard deviations are in milliseconds.',
+             'Exclusive parts plus Other partition each individual ROI trial; conditional observed means with different counts need not sum to a mean ROI. Inclusive loop elapsed includes nested loops/calls and may overlap: never sum inclusive values as a partition. Means and population standard deviations are in milliseconds.',
              'Negative baseline-to-instrumented changes reflect run noise and code-layout effects, not negative timer cost or a speedup.', '',
              '| Benchmark | n | ROI-only baseline mean ± std (ms) | Instrumented mean ± std (ms) | Observed change |',
              '|---|---:|---:|---:|---:|']
@@ -139,7 +166,19 @@ def evaluate(samples, output, tables_only=False):
                   '{observed_change_percent:+.1f}%'.format(**row))
         lines.append('| {kernel} | {n} | '.format(**row) + baseline +
                      ' | {instrumented_mean_ms:.6g} ± {instrumented_population_std_ms:.3g} | '.format(**row) + change + ' |')
-    lines += ['', 'A single-run measurement has n=1 and population std=0 by definition; it does not measure run-to-run variability. N/A means no baseline run was collected; no overhead estimate is invented.', '', 'benchmark-times.png shows one ordinary mean compute-ROI bar per benchmark. Each benchmark PNG shows region names on one shared time axis, with Other for all ROI time outside the named regions. Whiskers show population standard deviation; values above bars are milliseconds. Only PNG figures are produced.',
+    lines += ['', '## Target loop elapsed', '',
+              '| Benchmark | Loop | Observed exclusive n / ROI trials | Inclusive n | Inclusive mean ± std (ms) | Exclusive mean ± std (ms) |',
+              '|---|---|---:|---:|---:|---:|']
+    for row in summary:
+        if row['mode'] != 'instrumented' or row['region'] == 'Unattributed ROI':
+            continue
+        trials = next(item['n'] for item in roi if item['kernel'] == row['kernel'])
+        inclusive_text = ('Not recorded' if row['inclusive_mean_ms'] is None else
+                          '{inclusive_mean_ms:.6g} ± {inclusive_population_std_ms:.3g}'.format(**row))
+        lines.append('| {kernel} | {region} | {n}'.format(**row) + '/' + str(trials) +
+                     ' | {inclusive_n} | '.format(**row) + inclusive_text +
+                     ' | {mean_ms:.6g} ± {population_std_ms:.3g} |'.format(**row))
+    lines += ['', 'Counts refer to process trials with an actual ROI-overlap observation of that region; missing trials are not filled with fabricated zero timings. Inclusive means aggregate complete loop invocations within each process, not average individual iterations. Legacy CSVs without inclusive_ns remain explicitly unrecorded, never inferred from exclusive_ns.', '', 'A single-run measurement has n=1 and population std=0 by definition; it does not measure run-to-run variability. N/A means no baseline run was collected; no overhead estimate is invented.', '', 'benchmark-times.png shows the mean complete compute ROI. Per-benchmark PNGs use inclusive loop elapsed where recorded, including nested calls; these bars overlap and are not additive. Other is exclusive time outside all targets. Legacy data is explicitly labeled exclusive-only. Whiskers are population standard deviations across observed trials; values above bars are milliseconds.',
               'regions.csv ranks the measured loop-containing regions. This is curated source instrumentation, not exhaustive automatic detection of every C++ loop. Source file/symbol coverage is in tools/regions.json and the raw samples retain callsites.',
               'Each chart describes these bundled representative inputs, not a general comparison of algorithm performance. Very short regions can be dominated by timing overhead; zero-resolution observations do not prove zero work.']
     (output / 'REPORT.md').write_text('\n'.join(lines)+'\n')

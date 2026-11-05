@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 from plot import evaluate
 
-FIELDS = ['kernel', 'mode', 'trial', 'region', 'file', 'line', 'calls', 'exclusive_ns', 'total_roi_ns']
+FIELDS = ['kernel', 'mode', 'trial', 'region', 'file', 'line', 'calls', 'exclusive_ns', 'inclusive_ns', 'total_roi_ns']
 
 
 def preflight():
@@ -27,12 +27,13 @@ def read_timing(path):
     with path.open() as stream:
         reader = csv.DictReader(stream)
         expected = {'region', 'file', 'line', 'calls', 'exclusive_ns', 'total_roi_ns'}
-        if set(reader.fieldnames or []) != expected:
+        if set(reader.fieldnames or []) not in (expected, expected | {'inclusive_ns'}):
             raise ValueError('Unexpected timing CSV columns')
         rows = list(reader)
     if not rows:
         raise ValueError('Empty timing file')
-    if any(set(row) != expected or any(value is None for value in row.values()) for row in rows):
+    columns = set(reader.fieldnames)
+    if any(set(row) != columns or any(value is None for value in row.values()) for row in rows):
         raise ValueError('Malformed timing CSV row')
     regions = [row['region'] for row in rows]
     if len(set(regions)) != len(regions) or regions.count('Unattributed ROI') != 1:
@@ -46,6 +47,9 @@ def read_timing(path):
     for row in rows:
         if int(row['calls']) < 0 or int(row['line']) < 0:
             raise ValueError('Negative call count or source line')
+        if 'inclusive_ns' in row and row['region'] != 'Unattributed ROI':
+            if not row['inclusive_ns'] or int(row['inclusive_ns']) < int(row['exclusive_ns']):
+                raise ValueError('Inclusive loop elapsed must include its exclusive time')
     return rows
 
 
@@ -54,7 +58,7 @@ def collect(results):
     output.mkdir(exist_ok=False)
     with (results / 'summary.tsv').open() as stream:
         statuses = list(csv.DictReader(stream, delimiter='\t'))
-    samples, errors, status_lines = [], [], []
+    samples, errors, status_lines, outside = [], [], [], []
     for status in statuses:
         kernel = status['kernel']
         if status['status'] != 'PASS':
@@ -62,6 +66,11 @@ def collect(results):
             continue
         try:
             rows = read_timing(results / kernel / 'loops.csv')
+            coverage = results / kernel / 'loops.csv.coverage.csv'
+            if coverage.exists():
+                with coverage.open() as stream:
+                    outside.extend(kernel + ': ' + row['region'] for row in csv.DictReader(stream)
+                                   if row['status'] == 'outside_roi')
             samples.extend(dict(kernel=kernel, mode='instrumented', trial=0, **row) for row in rows)
             detail = 'ROI only; no named loop regions' if len(rows) == 1 else 'Named regions plus Other'
             status_lines.append(f'| {kernel} | PASS | {detail}; n=1 |')
@@ -84,6 +93,9 @@ def collect(results):
         stream.write('\n## This invocation\n\nOne process per selected benchmark; no warmups or baseline runs.\n'
                      'Failed/skipped benchmarks and invalid timing files are excluded from figures, not assigned zero time.\n\n'
                      '| Benchmark | Execution | Evaluation |\n|---|---|---|\n' + '\n'.join(status_lines) + '\n')
+        if outside:
+            stream.write('\nRegistered scopes reached only outside the ROI (not measured; no zero timing inferred):\n\n' +
+                         '\n'.join('- ' + name for name in outside) + '\n')
         if errors:
             stream.write('\n## Evaluation errors\n\n' + '\n'.join('- ' + error for error in errors) + '\n')
     for error in errors:

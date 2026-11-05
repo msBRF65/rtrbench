@@ -1,164 +1,486 @@
 [
   {
     "file": "perception/01.pfl/pfilter.cpp",
-    "symbol": "ParticleFilter::updateMotion",
-    "label": "Motion particle loop",
-    "line": 98
+    "symbol": "for (int i = 0; i < this->numParticles; i++) {",
+    "label": "Particle motion",
+    "line": 131,
+    "loop_start_line": 132,
+    "loop_end_line": 139,
+    "original_header_line": 131,
+    "original_end_line": 138,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "perception/01.pfl/pfilter.cpp",
-    "symbol": "ParticleFilter::updateSensor",
-    "label": "Sensor particle and ray loops",
-    "line": 158
+    "symbol": "while (true) {",
+    "label": "Ray marching",
+    "line": 227,
+    "loop_start_line": 228,
+    "loop_end_line": 245,
+    "original_header_line": 222,
+    "original_end_line": 239,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "perception/01.pfl/pfilter.cpp",
-    "symbol": "ParticleFilter::resample",
-    "label": "Particle resampling loops",
-    "line": 250
+    "symbol": "for (int eIdx = 0; eIdx < static_cast<int>(zStar.size()); eIdx++) {",
+    "label": "Ray likelihood product",
+    "line": 174,
+    "loop_start_line": 175,
+    "loop_end_line": 181,
+    "original_header_line": 172,
+    "original_end_line": 178,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "perception/01.pfl/pfilter.cpp",
+    "symbol": "while (u > c) {",
+    "label": "Cumulative resampling search",
+    "line": 277,
+    "loop_start_line": 278,
+    "loop_end_line": 281,
+    "original_header_line": 270,
+    "original_end_line": 273,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "include/rtrbench_utils.h",
+    "symbol": "for (int k = 0; k < rowB; k++) {",
+    "label": "Matrix multiplication MAC",
+    "line": 360,
+    "loop_start_line": 361,
+    "loop_end_line": 363,
+    "original_header_line": 358,
+    "original_end_line": 360,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "perception/02.ekfslam/ekf.cpp",
-    "symbol": "ExtKalmanFillter::predict",
-    "label": "State prediction matrix loops",
-    "line": 202
+    "symbol": "for (int i = 0; i < this->numEntries; i++) {",
+    "label": "EKF state update",
+    "line": 365,
+    "loop_start_line": 366,
+    "loop_end_line": 368,
+    "original_header_line": 366,
+    "original_end_line": 368,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "perception/02.ekfslam/ekf.cpp",
-    "symbol": "ExtKalmanFillter::update",
-    "label": "Landmark update matrix loops",
-    "line": 287
+    "symbol": "for (int j = 0; j < this->numEntries; j++) {",
+    "label": "EKF covariance copy",
+    "line": 391,
+    "loop_start_line": 392,
+    "loop_end_line": 394,
+    "original_header_line": 389,
+    "original_end_line": 391,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "perception/03.srec/transforms.cpp",
+    "symbol": "for (int j = 0; j < mapWidth; j++) {",
+    "label": "Depth unprojection pixels",
+    "line": 55,
+    "loop_start_line": 56,
+    "loop_end_line": 60,
+    "original_header_line": 53,
+    "original_end_line": 57,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "perception/03.srec/transforms.cpp",
+    "symbol": "for (int i = 0; i < num; i++) {",
+    "label": "Point projection",
+    "line": 79,
+    "loop_start_line": 80,
+    "loop_end_line": 84,
+    "original_header_line": 74,
+    "original_end_line": 78,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "perception/03.srec/transforms.cpp",
+    "symbol": "for (int i = 0; i < num; i++) {",
+    "label": "Point transformation",
+    "line": 126,
+    "loop_start_line": 127,
+    "loop_end_line": 129,
+    "original_header_line": 118,
+    "original_end_line": 120,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "perception/03.srec/reconstruct.cpp",
+    "symbol": "for (int i = 0; i < num; i++) {",
+    "label": "ICP correspondence system",
+    "line": 45,
+    "loop_start_line": 46,
+    "loop_end_line": 64,
+    "original_header_line": 43,
+    "original_end_line": 61,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "perception/03.srec/reconstruct.cpp",
+    "symbol": "for (int j = 0; j < num; j++) {",
+    "label": "ICP normal-equation MAC",
+    "line": 92,
+    "loop_start_line": 93,
+    "loop_end_line": 95,
+    "original_header_line": 87,
+    "original_end_line": 89,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "planning/04.pp2d/sdcar.cpp",
+    "symbol": "for (int i = 0; i < this->numNeighbors; i++) {",
+    "label": "2D neighbor coordinates",
+    "line": 98,
+    "loop_start_line": 99,
+    "loop_end_line": 101,
+    "original_header_line": 96,
+    "original_end_line": 98,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "planning/04.pp2d/sdcar.cpp",
+    "symbol": "for (int j = 0; j <= this->robotLength; j++) {",
+    "label": "2D footprint collision",
+    "line": 124,
+    "loop_start_line": 125,
+    "loop_end_line": 132,
+    "original_header_line": 119,
+    "original_end_line": 126,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/astar-bare/astar_bare.cpp",
-    "symbol": "AStar::run",
-    "label": "A-star expansion loop",
-    "line": 53
+    "symbol": "for (int dir = 0; dir < static_cast<int>(neighbors.size()); dir++) {",
+    "label": "A-star neighbor scoring",
+    "line": 101,
+    "loop_start_line": 102,
+    "loop_end_line": 120,
+    "original_header_line": 101,
+    "original_end_line": 119,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "planning/05.pp3d/drone.cpp",
+    "symbol": "for (int i = 0; i < numNeighbors; i++) {",
+    "label": "3D neighbor coordinates",
+    "line": 100,
+    "loop_start_line": 101,
+    "loop_end_line": 104,
+    "original_header_line": 98,
+    "original_end_line": 101,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/06.movtar/harness.cpp",
-    "symbol": "backwardDijkstra2D",
-    "label": "Backward Dijkstra loop",
-    "line": 64
+    "symbol": "for (int i = 0; i < NUM_2D_DIRS; i++) {",
+    "label": "Dijkstra neighbor relaxation",
+    "line": 117,
+    "loop_start_line": 118,
+    "loop_end_line": 131,
+    "original_header_line": 117,
+    "original_end_line": 130,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/06.movtar/harness.cpp",
-    "symbol": "aStar3D",
-    "label": "Time-space A-star loop",
-    "line": 170
+    "symbol": "for (int i = 0; i < NUM_3D_DIRS; i++) {",
+    "label": "Time-space neighbor relaxation",
+    "line": 229,
+    "loop_start_line": 230,
+    "loop_end_line": 254,
+    "original_header_line": 227,
+    "original_end_line": 251,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/07-10.robot-arm/prm.cpp",
-    "symbol": "PRM::query",
-    "label": "Roadmap search loop",
-    "line": 79
+    "symbol": "for (int i = 0; i < nodeId /*Do not include the new node itself*/; i++) {",
+    "label": "Roadmap connection candidates",
+    "line": 68,
+    "loop_start_line": 69,
+    "loop_end_line": 75,
+    "original_header_line": 68,
+    "original_end_line": 74,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/07-10.robot-arm/prm.cpp",
-    "symbol": "PRM::addVertice",
-    "label": "Roadmap connection loop",
-    "line": 64
+    "symbol": "for (auto const& neighbourPos : graph[expNode->pos].second) {",
+    "label": "Roadmap adjacent-edge search",
+    "line": 127,
+    "loop_start_line": 128,
+    "loop_end_line": 139,
+    "original_header_line": 125,
+    "original_end_line": 136,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/07-10.robot-arm/rrt.cpp",
-    "symbol": "RRT::query",
-    "label": "RRT sampling and path loops",
-    "line": 56
+    "symbol": "for (int i = 0; i < static_cast<int>(tree.size()); i++) {",
+    "label": "RRT nearest neighbor",
+    "line": 180,
+    "loop_start_line": 181,
+    "loop_end_line": 187,
+    "original_header_line": 177,
+    "original_end_line": 183,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/07-10.robot-arm/rrt_star.cpp",
-    "symbol": "RRTStar::query",
-    "label": "RRT-star sampling loop",
-    "line": 55
+    "symbol": "for (int i = 0; i < static_cast<int>(tree.size()); i++) {",
+    "label": "RRT-star nearest neighbor",
+    "line": 172,
+    "loop_start_line": 173,
+    "loop_end_line": 179,
+    "original_header_line": 169,
+    "original_end_line": 175,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "planning/07-10.robot-arm/rrt_star.cpp",
+    "symbol": "for (auto const& xNear : neighbors) {",
+    "label": "RRT-star rewiring",
+    "line": 139,
+    "loop_start_line": 140,
+    "loop_end_line": 156,
+    "original_header_line": 139,
+    "original_end_line": 155,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "planning/07-10.robot-arm/rrt.cpp",
+    "symbol": "for (int i = 0; i < this->ppIters; i++) {",
+    "label": "Path-shortcut anchor trials",
+    "line": 100,
+    "loop_start_line": 101,
+    "loop_end_line": 119,
+    "original_header_line": 100,
+    "original_end_line": 118,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/07-10.robot-arm/planner.cpp",
-    "symbol": "Planner::canConnect",
-    "label": "Configuration interpolation loop",
-    "line": 250
+    "symbol": "for (int j = 0; j < this->dof; j++) {",
+    "label": "Joint interpolation",
+    "line": 225,
+    "loop_start_line": 226,
+    "loop_end_line": 246,
+    "original_header_line": 224,
+    "original_end_line": 244,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "planning/11-12.sym-planner/harness.cpp",
-    "symbol": "plan",
-    "label": "Symbolic A-star action loop",
-    "line": 43
+    "symbol": "for (GroundedCondition precond : ga.getPreconditions()) {",
+    "label": "Action precondition matching",
+    "line": 109,
+    "loop_start_line": 110,
+    "loop_end_line": 114,
+    "original_header_line": 106,
+    "original_end_line": 110,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
-    "file": "planning/11-12.sym-planner/env.cpp",
-    "symbol": "Environment::getAllGroundedActs",
-    "label": "Action grounding loops",
-    "line": 283
+    "file": "planning/11-12.sym-planner/harness.cpp",
+    "symbol": "for (GroundedCondition effect : ga.getEffects()) {",
+    "label": "Action effects",
+    "line": 123,
+    "loop_start_line": 124,
+    "loop_end_line": 132,
+    "original_header_line": 117,
+    "original_end_line": 125,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
-    "file": "control/14.mpc/mpc.cpp",
-    "symbol": "ModelPredictiveControl::simulate",
-    "label": "MPC simulation loop",
-    "line": 72
-  },
-  {
-    "file": "control/14.mpc/mpc.cpp",
-    "symbol": "ModelPredictiveControl::iterativeMpcControl",
-    "label": "MPC refinement loop",
-    "line": 370
-  },
-  {
-    "file": "control/14.mpc/mpc.cpp",
-    "symbol": "ModelPredictiveControl::linearMpcControl",
-    "label": "QP assembly and solver loops",
-    "line": 295
+    "file": "planning/11-12.sym-planner/harness.cpp",
+    "symbol": "for (GroundedCondition gCond : goalState) {",
+    "label": "Goal-condition heuristic",
+    "line": 51,
+    "loop_start_line": 52,
+    "loop_end_line": 54,
+    "original_header_line": 51,
+    "original_end_line": 53,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/13.dmp/harness.cpp",
-    "symbol": "while (t <= T)",
-    "label": "DMP integration and basis loops",
-    "line": 128
+    "symbol": "for (auto c : C) {",
+    "label": "Gaussian basis values",
+    "line": 136,
+    "loop_start_line": 137,
+    "loop_end_line": 142,
+    "original_header_line": 135,
+    "original_end_line": 140,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/13.dmp/harness.cpp",
+    "symbol": "for (int i = 0; i < static_cast<int>(Phi.size()); i++) {",
+    "label": "Basis normalization",
+    "line": 146,
+    "loop_start_line": 147,
+    "loop_end_line": 149,
+    "original_header_line": 142,
+    "original_end_line": 144,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/13.dmp/harness.cpp",
+    "symbol": "for (int i = 0; i < static_cast<int>(weights.size()); i++) {",
+    "label": "Force inner product",
+    "line": 155,
+    "loop_start_line": 156,
+    "loop_end_line": 158,
+    "original_header_line": 148,
+    "original_end_line": 150,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/13.dmp/harness.cpp",
+    "symbol": "while (t <= T) {",
+    "label": "DMP time integration",
+    "line": 128,
+    "loop_start_line": 129,
+    "loop_end_line": 167,
+    "original_header_line": 129,
+    "original_end_line": 158,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/14.mpc/mpc.cpp",
+    "symbol": "for (int t = 0; t < this->T; t++) {",
+    "label": "QP horizon assembly",
+    "line": 310,
+    "loop_start_line": 311,
+    "loop_end_line": 347,
+    "original_header_line": 311,
+    "original_end_line": 347,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/14.mpc/mpc.cpp",
+    "symbol": "for (int j = 0; j < this->T; j++) {",
+    "label": "MPC convergence difference",
+    "line": 392,
+    "loop_start_line": 393,
+    "loop_end_line": 396,
+    "original_header_line": 391,
+    "original_end_line": 394,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/14.mpc/solver.cpp",
+    "symbol": "for (i = 0; i < 56; i++)",
+    "label": "QP primal update",
+    "line": 406,
+    "loop_start_line": 407,
+    "loop_end_line": 408,
+    "original_header_line": 404,
+    "original_end_line": 405,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/15.cem/harness.cpp",
-    "symbol": "for (int s = 0; s < numSamples; s++)",
-    "label": "Policy sample and reward loop",
-    "line": 175
+    "symbol": "for (int i = 0; i < static_cast<int>(mu.size()); i++) {",
+    "label": "CEM parameter sampling",
+    "line": 57,
+    "loop_start_line": 58,
+    "loop_end_line": 61,
+    "original_header_line": 56,
+    "original_end_line": 59,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/15.cem/harness.cpp",
-    "symbol": "for (int i = 0; i < numSamples; i++)",
-    "label": "Elite selection loop",
-    "line": 201
+    "symbol": "for (int i = 0; i < numSamples; i++) {",
+    "label": "CEM elite selection",
+    "line": 201,
+    "loop_start_line": 202,
+    "loop_end_line": 207,
+    "original_header_line": 202,
+    "original_end_line": 207,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/15.cem/harness.cpp",
-    "symbol": "for (int i = 0; i < static_cast<int>(policyMu.size()); i++)",
-    "label": "Policy distribution fit loop",
-    "line": 214
+    "symbol": "for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {",
+    "label": "CEM policy fitting",
+    "line": 214,
+    "loop_start_line": 215,
+    "loop_end_line": 234,
+    "original_header_line": 215,
+    "original_end_line": 234,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/16.bo/harness.cpp",
-    "symbol": "for (int s = 0; s < numSamples; s++)",
-    "label": "Policy sample and reward loop",
-    "line": 196
+    "symbol": "for (int i = 0; i < static_cast<int>(mu.size()); i++) {",
+    "label": "BO parameter sampling",
+    "line": 58,
+    "loop_start_line": 59,
+    "loop_end_line": 62,
+    "original_header_line": 57,
+    "original_end_line": 60,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/16.bo/harness.cpp",
-    "symbol": "for (int i = 0; i < numSamples; i++)",
-    "label": "Elite selection loop",
-    "line": 216
+    "symbol": "for (int i = 0; i < numSamples; i++) {",
+    "label": "BO elite selection",
+    "line": 216,
+    "loop_start_line": 217,
+    "loop_end_line": 222,
+    "original_header_line": 217,
+    "original_end_line": 222,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/16.bo/harness.cpp",
-    "symbol": "for (int i = 0; i < static_cast<int>(policyMu.size()); i++)",
-    "label": "Policy distribution fit loop",
-    "line": 229
+    "symbol": "for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {",
+    "label": "BO policy fitting",
+    "line": 229,
+    "loop_start_line": 230,
+    "loop_end_line": 249,
+    "original_header_line": 230,
+    "original_end_line": 249,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/16.bo/gauss_proc.cpp",
-    "symbol": "GaussianProcess::train",
-    "label": "Gaussian process training loops",
-    "line": 57
+    "symbol": "for (int p = 0; p < static_cast<int>(xI->size()); p++) {",
+    "label": "Gaussian kernel dimensions",
+    "line": 97,
+    "loop_start_line": 98,
+    "loop_end_line": 103,
+    "original_header_line": 95,
+    "original_end_line": 100,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   },
   {
     "file": "control/16.bo/gauss_proc.cpp",
-    "symbol": "GaussianProcess::test",
-    "label": "Gaussian process prediction loops",
-    "line": 114
+    "symbol": "for (int j = 0; j < static_cast<int>(x.size()); j++) {",
+    "label": "GP covariance entries",
+    "line": 88,
+    "loop_start_line": 89,
+    "loop_end_line": 111,
+    "original_header_line": 88,
+    "original_end_line": 107,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
+  },
+  {
+    "file": "control/16.bo/gauss_proc.cpp",
+    "symbol": "for (int i = 0; i < l; i++) {",
+    "label": "GP prediction inner product",
+    "line": 148,
+    "loop_start_line": 149,
+    "loop_end_line": 152,
+    "original_header_line": 143,
+    "original_end_line": 146,
+    "original_source_ref": "0884907922936e7a5eebd937d7a7f75e343dd8f2"
   }
 ]

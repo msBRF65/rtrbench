@@ -29,6 +29,7 @@
  * SOFTWARE.
 */
 
+#include "zsim_hooks.h"
 #include "reconstruct.h"
 #include <algorithm>
 #include <vector>
@@ -40,24 +41,27 @@ namespace reconstruct {
     void buildLinearSystem(double **srcPoints, double **tarPoints, \
             double **tarNormals, int num, double **T, double **A, double *b) {
         double **sPointsPrime = transforms::transform(srcPoints, num, T);
-        for (int i = 0; i < num; i++) {
-            double *theSrcPoint = sPointsPrime[i];
-            double *theTarPoint = tarPoints[i];
-            double *theTarNormal = tarNormals[i];
+        {
+            RTRBENCH_LOOP("ICP correspondence system");
+            for (int i = 0; i < num; i++) {
+                double *theSrcPoint = sPointsPrime[i];
+                double *theTarPoint = tarPoints[i];
+                double *theTarNormal = tarNormals[i];
 
-            A[i][0] = theSrcPoint[1] * theTarNormal[2] - \
-                      theSrcPoint[2] * theTarNormal[1];
-            A[i][1] = theSrcPoint[2] * theTarNormal[0] - \
-                      theSrcPoint[0] * theTarNormal[2];
-            A[i][2] = theSrcPoint[0] * theTarNormal[1] - \
-                      theSrcPoint[1] * theTarNormal[0];
-            A[i][3] = theTarNormal[0];
-            A[i][4] = theTarNormal[1];
-            A[i][5] = theTarNormal[2];
+                A[i][0] = theSrcPoint[1] * theTarNormal[2] - \
+                          theSrcPoint[2] * theTarNormal[1];
+                A[i][1] = theSrcPoint[2] * theTarNormal[0] - \
+                          theSrcPoint[0] * theTarNormal[2];
+                A[i][2] = theSrcPoint[0] * theTarNormal[1] - \
+                          theSrcPoint[1] * theTarNormal[0];
+                A[i][3] = theTarNormal[0];
+                A[i][4] = theTarNormal[1];
+                A[i][5] = theTarNormal[2];
 
-            b[i] = (theTarNormal[0] * (theTarPoint[0] - theSrcPoint[0])) + \
-                   (theTarNormal[1] * (theTarPoint[1] - theSrcPoint[1])) + \
-                   (theTarNormal[2] * (theTarPoint[2] - theSrcPoint[2]));
+                b[i] = (theTarNormal[0] * (theTarPoint[0] - theSrcPoint[0])) + \
+                       (theTarNormal[1] * (theTarPoint[1] - theSrcPoint[1])) + \
+                       (theTarNormal[2] * (theTarPoint[2] - theSrcPoint[2]));
+            }
         }
 
         for (int i = 0; i < num; i++) delete[] sPointsPrime[i];
@@ -84,8 +88,11 @@ namespace reconstruct {
         double *bPrime = new double[vars]();  // 1 x 6
 
         for (int i = 0; i < vars; i++) {
-            for (int j = 0; j < num; j++) {
-                bPrime[i] += transposedA[i][j] * b[j];
+            {
+                RTRBENCH_LOOP("ICP normal-equation MAC");
+                for (int j = 0; j < num; j++) {
+                    bPrime[i] += transposedA[i][j] * b[j];
+                }
             }
         }
 

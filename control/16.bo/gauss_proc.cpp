@@ -54,7 +54,6 @@ GaussianProcess::~GaussianProcess() {
 
 void GaussianProcess::train(const std::vector<PARAM> &x, \
         const std::vector<double> &y) {
-    RTRBENCH_LOOP("Gaussian process training loops");
     // Clear data structures
     assert(this->xTrain.size() == this->yTrain.size());
     if (!this->xTrain.empty()) {
@@ -85,24 +84,30 @@ void GaussianProcess::train(const std::vector<PARAM> &x, \
 
     // Compute K matrix
     for (int i = 0; i < static_cast<int>(x.size()); i++) {
-        for (int j = 0; j < static_cast<int>(x.size()); j++) {
-            PARAM *xI = &this->xTrain[i];
-            PARAM *xJ = &this->xTrain[j];
-            assert(xI->size() == xJ->size());
-            assert(xI->size() == this->sigmaL.size());
+        {
+            RTRBENCH_LOOP("GP covariance entries");
+            for (int j = 0; j < static_cast<int>(x.size()); j++) {
+                PARAM *xI = &this->xTrain[i];
+                PARAM *xJ = &this->xTrain[j];
+                assert(xI->size() == xJ->size());
+                assert(xI->size() == this->sigmaL.size());
 
-            double k = 0;
-            for (int p = 0; p < static_cast<int>(xI->size()); p++) {
-                auto d = xI->at(p) - xJ->at(p);
-                d *= this->sigmaL[p] * this->sigmaL[p];
-                d *= xI->at(p) - xJ->at(p);
-                k += d;
-            }
+                double k = 0;
+                {
+                    RTRBENCH_LOOP("Gaussian kernel dimensions");
+                    for (int p = 0; p < static_cast<int>(xI->size()); p++) {
+                        auto d = xI->at(p) - xJ->at(p);
+                        d *= this->sigmaL[p] * this->sigmaL[p];
+                        d *= xI->at(p) - xJ->at(p);
+                        k += d;
+                    }
+                }
 
-            this->kMatrix[i][j] = this->sigmaA * this->sigmaA * exp(-0.5 * k);
+                this->kMatrix[i][j] = this->sigmaA * this->sigmaA * exp(-0.5 * k);
 
-            if (i == j) {
-                this->kMatrix[i][j] += this->sigmaN * this->sigmaN;
+                if (i == j) {
+                    this->kMatrix[i][j] += this->sigmaN * this->sigmaN;
+                }
             }
         }
     }
@@ -111,7 +116,6 @@ void GaussianProcess::train(const std::vector<PARAM> &x, \
 }
 
 std::pair<double, double> GaussianProcess::test(const PARAM &x) const {
-    RTRBENCH_LOOP("Gaussian process prediction loops");
     int l = static_cast<int>(this->xTrain.size());
 
     double **kVec = new double*[1];
@@ -140,9 +144,12 @@ std::pair<double, double> GaussianProcess::test(const PARAM &x) const {
     assert(l == static_cast<int>(this->yTrain.size()));
     double yMu = 0;
     double yStd = 0;
-    for (int i = 0; i < l; i++) {
-        yMu += m[0][i] * this->yTrain[i];
-        yStd += m[0][i] * kVec[0][i];
+    {
+        RTRBENCH_LOOP("GP prediction inner product");
+        for (int i = 0; i < l; i++) {
+            yMu += m[0][i] * this->yTrain[i];
+            yStd += m[0][i] * kVec[0][i];
+        }
     }
 
     delete[] kVec[0];

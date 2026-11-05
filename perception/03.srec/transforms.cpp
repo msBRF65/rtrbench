@@ -29,6 +29,7 @@
  * SOFTWARE.
 */
 
+#include "zsim_hooks.h"
 #include "transforms.h"
 #include <algorithm>
 
@@ -50,10 +51,13 @@ namespace transforms {
         }
 
         for (int i = 0; i < mapHeight; i++) {
-            for (int j = 0; j < mapWidth; j++) {
-                vertexMap[i][j][0] = (j - cx) / fx * depthMap[i][j];
-                vertexMap[i][j][1] = (i - cy) / fy * depthMap[i][j];
-                vertexMap[i][j][2] = depthMap[i][j];
+            {
+                RTRBENCH_LOOP("Depth unprojection pixels");
+                for (int j = 0; j < mapWidth; j++) {
+                    vertexMap[i][j][0] = (j - cx) / fx * depthMap[i][j];
+                    vertexMap[i][j][1] = (i - cy) / fy * depthMap[i][j];
+                    vertexMap[i][j][2] = depthMap[i][j];
+                }
             }
         }
 
@@ -71,10 +75,13 @@ namespace transforms {
         double *v = uvd + num;
         double *d = uvd + 2*num;
 
-        for (int i = 0; i < num; i++) {
-            u[i] = fx * points[i][0] / points[i][2] + cx;
-            v[i] = fy * points[i][1] / points[i][2] + cy;
-            d[i] = points[i][2];
+        {
+            RTRBENCH_LOOP("Point projection");
+            for (int i = 0; i < num; i++) {
+                u[i] = fx * points[i][0] / points[i][2] + cx;
+                v[i] = fy * points[i][1] / points[i][2] + cy;
+                d[i] = points[i][2];
+            }
         }
 
         return uvd;
@@ -115,8 +122,11 @@ namespace transforms {
         double **newPoints = new double*[num];
         for (int i = 0; i < num; i++) newPoints[i] = new double[3];
 
-        for (int i = 0; i < num; i++) {
-            newPoints[i] = transform(points[i], T);
+        {
+            RTRBENCH_LOOP("Point transformation");
+            for (int i = 0; i < num; i++) {
+                newPoints[i] = transform(points[i], T);
+            }
         }
 
         return newPoints;

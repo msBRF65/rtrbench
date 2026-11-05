@@ -54,9 +54,12 @@ static std::vector<double> sample(const PARAM &mu, const PARAM &cov) {
     assert(mu.size() == cov.size());
 
     std::vector<double> r;
-    for (int i = 0; i < static_cast<int>(mu.size()); i++) {
-        std::normal_distribution<double> distribution(mu[i], cov[i]);
-        r.push_back(distribution(generator));
+    {
+        RTRBENCH_LOOP("BO parameter sampling");
+        for (int i = 0; i < static_cast<int>(mu.size()); i++) {
+            std::normal_distribution<double> distribution(mu[i], cov[i]);
+            r.push_back(distribution(generator));
+        }
     }
 
     return r;
@@ -192,18 +195,15 @@ int main(int argc, const char **argv) {
 
         policiesLog.push_back(policyMu);
 
-        {
-            RTRBENCH_LOOP("Policy sample and reward loop");
-            for (int s = 0; s < numSamples; s++) {
-                auto sampledParams = sample(policyMu, policyCov);
-                auto d = gp->test(sampledParams);
+        for (int s = 0; s < numSamples; s++) {
+            auto sampledParams = sample(policyMu, policyCov);
+            auto d = gp->test(sampledParams);
 
-                // Compute UCB acquisition function value
-                auto acquisition = d.first + beta * d.second;
+            // Compute UCB acquisition function value
+            auto acquisition = d.first + beta * d.second;
 
-                skillParams.push_back(sampledParams);
-                rewards.push_back(acquisition);
-            }
+            skillParams.push_back(sampledParams);
+            rewards.push_back(acquisition);
         }
 
         // CEM fitting of next distribution
@@ -213,7 +213,7 @@ int main(int argc, const char **argv) {
         double rewardThreshold = sortedRewards[numSamples - topN];
         std::vector<int> chosenIndices;
         {
-            RTRBENCH_LOOP("Elite selection loop");
+            RTRBENCH_LOOP("BO elite selection");
             for (int i = 0; i < numSamples; i++) {
                 if (rewards[i] >= rewardThreshold) {
                     chosenIndices.push_back(i);
@@ -226,7 +226,7 @@ int main(int argc, const char **argv) {
 
         // Update policy
         {
-            RTRBENCH_LOOP("Policy distribution fit loop");
+            RTRBENCH_LOOP("BO policy fitting");
             for (int i = 0; i < static_cast<int>(policyMu.size()); i++) {
                 // Update mean
                 double sum = policyMu[i];
