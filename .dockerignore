@@ -1,0 +1,6 @@
+.git
+**/obj
+**/*.out
+**/__pycache__
+**/*.raw
+results

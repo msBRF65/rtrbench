@@ -35,3 +35,11 @@ runs an experiment per configuration.
 **NOTE:** This program is extremely memory intensive. Running multiple
 instances of it in parallel may cause out-of-memory errors; that is why the
 `run_all.sh` script does *not* run different experiments in parallel.
+
+### Recover the small SLAMBench sample
+
+If the original input archive is unavailable, [data-gen](../../data-gen/README.md)
+downloads the matching two-frame raw/GT sample, converts it to lossless PNG16 depth
+and RGB, supplies its camera calibration, and runs this directory's real
+preprocessor in Docker. Use the generated `intrinsics.json` and two frames when
+running the kernel. The sample does not replace the full trajectory.

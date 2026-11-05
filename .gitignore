@@ -11,3 +11,7 @@ __pycache__/
 # Machine-specific measurement results stay local.
 /evaluation/example/*.csv
 /evaluation/example/REPORT.md
+
+# Generated scene data
+/data-gen/generated/
+**/*.raw
