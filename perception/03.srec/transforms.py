@@ -4,7 +4,11 @@ import numpy as np
 
 
 def unproject(depth_map, intrinsic):
-    depth_map = depth_map[:,:,0]
+    # Open3D returns scalar depth images as HxW; retain support for legacy HxWx1.
+    if depth_map.ndim == 3 and depth_map.shape[2] == 1:
+        depth_map = depth_map[:, :, 0]
+    if depth_map.ndim != 2:
+        raise ValueError("Expected a single-channel depth image")
     h, w = depth_map.shape
     fx = intrinsic[0, 0]
     fy = intrinsic[1, 1]

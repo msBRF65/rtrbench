@@ -154,3 +154,10 @@ and paired baseline checks for the 15 bundled workloads other than scene
 reconstruction. [evaluation/README.md](evaluation/README.md) describes reproducible
 PNG timing bar charts, raw statistics, and overhead/precision limits. Normal builds
 remain uninstrumented.
+
+### Regenerate scene-reconstruction inputs
+
+[data-gen/README.md](data-gen/README.md) provides a Docker workflow that downloads
+the matching small SLAMBench raw/ground-truth pair, converts both real frames into
+SREC input, and runs and validates the existing Python preprocessor. Use its
+generated calibration and `--scene-frames 2` with the root runner.

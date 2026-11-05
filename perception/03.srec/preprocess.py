@@ -30,7 +30,9 @@ def load_gt_poses(gt_filename):
     with open(gt_filename) as f:
         content = f.readlines()
         for line in content:
-            data = np.array(list(map(float, line.strip().split(' '))))
+            if not line.strip() or line.lstrip().startswith('#'):
+                continue
+            data = np.array(list(map(float, line.strip().split())))
             indices.append(int(data[0]))
 
             data = data[1:]
@@ -54,11 +56,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'path', help='path to the dataset folder containing rgb/ and depth/')
+    parser.add_argument(
+        "--intrinsics", default="intrinsics.json", help="Open3D camera intrinsic JSON")
     args = parser.parse_args()
 
     # Load intrinsics and gt poses for evaluation
-    intrinsic_struct = o3d.io.read_pinhole_camera_intrinsic('intrinsics.json')
+    intrinsic_struct = o3d.io.read_pinhole_camera_intrinsic(args.intrinsics)
     intrinsic = np.array(intrinsic_struct.intrinsic_matrix)
+    if intrinsic_struct.width <= 0 or intrinsic_struct.height <= 0:
+        parser.error("Camera intrinsics must describe a valid image size")
+    if not np.isfinite(intrinsic).all() or intrinsic[0, 0] == 0 or intrinsic[1, 1] == 0:
+        parser.error("Camera focal lengths must be finite and nonzero")
     indices, gt_poses = load_gt_poses(
         os.path.join(args.path, 'livingRoom2.gt.freiburg'))
     depth_scale = 5000.0
@@ -77,6 +85,8 @@ if __name__ == '__main__':
         print('Preprocessing frame {:03d}'.format(i))
         depth = np.asarray(o3d.io.read_image('{}/{}.png'.format(
             depth_path, i))) / depth_scale
+        if depth.shape[:2] != (intrinsic_struct.height, intrinsic_struct.width):
+            raise ValueError("Depth image dimensions differ from camera intrinsics")
         vertex_map = transforms.unproject(depth, intrinsic)
 
         pcd = o3d_utility.make_point_cloud(vertex_map.reshape((-1, 3)))
