@@ -161,3 +161,61 @@ remain uninstrumented.
 the matching small SLAMBench raw/ground-truth pair, converts both real frames into
 SREC input, and runs and validates the existing Python preprocessor. Use its
 generated calibration and `--scene-frames 2` with the root runner.
+
+### Automatic timing evaluation
+
+`./run.sh --build --skip 03.srec` also produces timing PNGs and a report
+**automatically** in `results/YYYYMMDD-HHMMSS-PID/evaluation/`. The selected
+benchmarks each run once. `--build` is optional in this evaluation mode: isolated
+loop-instrumented binaries/objects are built under that invocation's `build/`
+directory, once per shared kernel directory. Ordinary binaries/objects are not
+reused or overwritten. Builds and input loading are outside the plotted compute ROI.
+
+Automatic plots need **Python 3.7+ and matplotlib 3.5+** in the same interpreter.
+Use `--python /path/to/python` (or `RTRBENCH_PYTHON`) to select that environment.
+Dependencies are checked before building or creating output; nothing is installed
+automatically. `--dry-run`, `--list`, and `--help` require no plotting dependency.
+
+```sh
+./run.sh --skip 03.srec                         # One timed invocation + automatic PNGs/report
+./run.sh --kernel 13.dmp --python python3.11     # Selected workload; choose plotting Python
+./run.sh --no-evaluation --build --skip 03.srec  # Original C++-only build/run workflow
+```
+
+The evaluation folder contains `benchmark-times.png`, one `<benchmark>.png` per
+successful timed benchmark (including `Other`), `REPORT.md`, raw `samples.csv` and
+statistical CSVs. One run means `n=1`, population std=0 by definition, and no
+run-to-run variability measurement. No baseline is run automatically: baseline
+and overhead columns show N/A. The separate paired-repeat measurement workflow
+remains available in [tools/README.md](tools/README.md).
+
+Failed/skipped kernels are listed and excluded from plots rather than assigned
+zero time. Missing/invalid timing on a successful process makes evaluation fail;
+other valid results remain visible. The runner continues selected kernels and
+exits nonzero for any kernel or evaluation failure. `evaluation.log`, per-kernel
+logs and `summary.tsv` remain alongside the evaluation folder.
+
+Use `--output-dir /path/to/new-results` to place the complete run elsewhere.
+Existing output is refused. Instrumented GNU make paths cannot contain whitespace;
+ordinary `--no-evaluation` runs retain support for output paths with spaces.
+All generated default results remain ignored by Git, including CSVs and reports.
+To reuse existing **instrumented** binaries, set `RTRBENCH_BINARY_ROOT` to a previous
+run's absolute `build/` path without `--build`; ordinary uninstrumented binaries
+will fail evaluation because their timing files are missing.
+
+Scene reconstruction still needs its prepared inputs; use `--skip 03.srec` when
+unavailable. With a real prepared scene and calibration, its existing ROI is
+measured as `Other` only: no named SREC loop regions are claimed. See
+[evaluation/README.md](evaluation/README.md) for the generated figures and limits.
+
+To evaluate **all 16 together**, first prepare the two-frame scene with the
+[data-generation workflow](data-gen/README.md), then run without `--skip`:
+
+```sh
+./run.sh --build --scene-dir /absolute/path/srec-output/scene \
+  --camera /absolute/path/srec-output/scene/intrinsics.json --scene-frames 2
+```
+
+The same timestamped evaluation directory then contains the overview plus all 16
+benchmark PNGs. SREC contributes its measured compute ROI as `Other`, using the
+same real raw-derived inputs as its standalone workflow.
