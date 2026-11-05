@@ -13,5 +13,6 @@ __pycache__/
 /evaluation/example/REPORT.md
 
 # Generated scene data
+data/
 /data-gen/generated/
 **/*.raw

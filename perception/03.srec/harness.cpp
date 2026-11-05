@@ -128,7 +128,7 @@ int main(int argc, const char **argv) {
     int startIdx = startIdxArg.found() ? \
                    startIdxArg.value() : 1;
     int endIdx = endIdxArg.found() ? \
-                 endIdxArg.value() : 10;
+                 endIdxArg.value() : 2;
     int downsample = downsampleArg.found() ? \
                      downsampleArg.value() : 1;
     std::string outputFile = outputArg.found() ? \
